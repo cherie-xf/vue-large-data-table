@@ -11,14 +11,15 @@ export default {
       $(this.$el).addClass('odd');
     }
     $(this.$el).append('<div class="vu-td fixed-td">'+(this.rowIndex + 1)+'</div>');
-    this.row.forEach(function(col, idx){
-      var td = $('<div class="vu-td"></div>').append(col);
-      if(this.colWidths[idx]){
-        td.width(this.colWidths[idx]);
-        //td.css('width', this.colWidths[idx]);
-      }
-      $(this.$el).append(td);
-    }, this);
+    this.$nextTick(function(){
+      this.row.forEach(function(col, idx){
+        var td = $('<div class="vu-td"></div>').append(col);
+        if(this.colWidths[idx]){
+          td.width(this.colWidths[idx]);
+        }
+        $(this.$el).append(td);
+      }, this);
+    });
     this.rowHeights[this.rowIndex] = $(this.$el).height();
     console.log('row height', $(this.$el).height());
   },

@@ -28,8 +28,8 @@
       "plugin:vue/essential",
       "eslint:recommended"
     ],
-    "globals":{
-      "$":true,
+    "globals": {
+      "$": true,
       "jQuery": true
     }
   },
@@ -39,8 +39,8 @@
     }
   },
   "globals": {
-      "$":true,
-      "jQuery": true
+    "$": true,
+    "jQuery": true
   },
   "env": {
     "browser": true,

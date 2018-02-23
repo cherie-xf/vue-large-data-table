@@ -76,6 +76,7 @@ export default {
       $(th).css("width", th.offsetWidth); // for resize
       $(th).css("flexGrow", "0"); // for resize
     }, this);
+    console.log(this.colWidths);
   },
   computed:{
     copyrows: function(){
