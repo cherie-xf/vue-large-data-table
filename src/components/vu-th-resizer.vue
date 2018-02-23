@@ -1,8 +1,12 @@
+<template>
+  <div class="vu-th-resizer" @mousedown="onDown"></div>
+</template>
+
 <script>
 export default {
   name:'vuThResizer',
   props:["thIndex"],
-  template:'<div class="vu-th-resizer" @mousedown="onDown"></div>',
+  //template:'<div class="vu-th-resizer" @mousedown="onDown"></div>',
   data: function(){
    return {
     startX: 0,

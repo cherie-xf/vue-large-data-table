@@ -8,8 +8,8 @@ window.Vue = Vue
 
 
 Vue.config.productionTip = false
-Vue.component('vuRowFormat', require('./components/vu-row-format.vue'));
-Vue.component('vuThResizer', require('./components/vu-th-resizer.vue'));
+Vue.component('vuRowFormat', require('./components/vu-row-format.vue').default);
+Vue.component('vuThResizer', require('./components/vu-th-resizer.vue').default);
 
 new Vue({
   render: h => h(App)

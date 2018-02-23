@@ -15,6 +15,7 @@ export default {
       var td = $('<div class="vu-td"></div>').append(col);
       if(this.colWidths[idx]){
         td.width(this.colWidths[idx]);
+        //td.css('width', this.colWidths[idx]);
       }
       $(this.$el).append(td);
     }, this);
