@@ -149,16 +149,16 @@ export default {
 .vu-table .vu-tbody .vu-format-tr.odd {
   background-color: #eff4f7;
 }
-.vu-table .vu-tbody .vu-format-tr .vu-td {
+.vu-table .vu-tbody .vu-format-tr >>> .vu-td {
   height: 100%;
   overflow-x: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   flex-shrink: 0;
-  padding: 2px 5px;
+  padding: 2px 4px;
   border-right: 1px solid #F1F1F1;
 }
-.vu-table .vu-tbody .vu-format-tr .vu-td.fixed-td {
+.vu-table .vu-tbody .vu-format-tr >>> .vu-td.fixed-td {
   width: 45px;
   flex-grow: 0;
 }

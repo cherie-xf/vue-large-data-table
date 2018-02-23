@@ -1,7 +1,7 @@
 <template>
   <div class="hello">
-    <h1>{{ msg }}</h1>
     <!--
+    <h1>{{ msg }}</h1>
       <vu-table v-bind:col-defs="colDefs" v-bind:rows="rows" ng-non-bindable> </vu-table>
       -->
       <vuTable v-bind:col-defs="colDefs" v-bind:rows="rows"></vuTable>

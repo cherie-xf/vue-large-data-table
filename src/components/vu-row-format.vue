@@ -43,4 +43,20 @@ export default {
 </script>
 
 <style scoped>
+/* why not work?
+.vu-td {
+  height: 100%;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex-shrink: 0;
+  padding: 2px 5px;
+  border-right: 1px solid #F1F1F1;
+}
+
+.vu-td.fixed-td {
+  width: 45px;
+  flex-grow: 0;
+}
+*/
 </style>
