@@ -1,39 +1,46 @@
 <template>
   <div class="hello">
     <h1>{{ msg }}</h1>
-    <p>
-      For guide and recipes on how to configure / customize this project,<br>
-      check out the
-      <a href="https://github.com/vuejs/vue-cli/tree/dev/docs" target="_blank">vue-cli documentation</a>.
-    </p>
-    <h3>Installed CLI Plugins</h3>
-    <ul>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-babel" target="_blank">babel</a></li>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-eslint" target="_blank">eslint</a></li>
-    </ul>
-    <h3>Essential Links</h3>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank">Forum</a></li>
-      <li><a href="https://chat.vuejs.org" target="_blank">Community Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank">Twitter</a></li>
-    </ul>
-    <h3>Ecosystem</h3>
-    <ul>
-      <li><a href="https://router.vuejs.org/en/essentials/getting-started.html" target="_blank">vue-router</a></li>
-      <li><a href="https://vuex.vuejs.org/en/intro.html" target="_blank">vuex</a></li>
-      <li><a href="https://github.com/vuejs/vue-devtools#vue-devtools" target="_blank">vue-devtools</a></li>
-      <li><a href="https://vue-loader.vuejs.org/en" target="_blank">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank">awesome-vue</a></li>
-    </ul>
+    <!--
+      <vu-table v-bind:col-defs="colDefs" v-bind:rows="rows" ng-non-bindable> </vu-table>
+      -->
+      <vuTable v-bind:col-defs="colDefs" v-bind:rows="rows"></vuTable>
   </div>
 </template>
 
 <script>
+import vuTable from './table.vue'
+//import vuRowFormat from './vu-row-format.vue'
 export default {
   name: 'HelloWorld',
   props: {
     msg: String
+  },
+  components:{
+    vuTable
+    //vuRowFormat
+
+  },
+    data: function(){
+    return {
+      colDefs: ["threat", "threattype", "threatlevel", "threatweight", "incidents"],
+
+    }
+  },
+  computed: {
+    rows: function(){
+      var arr = [];
+      for(var i = 0, len = 200; i<len; i++){
+        var subarr = [];
+        for(var j=0, jlen = 5; j<jlen; j++){
+          subarr.push("test");
+        }
+        arr.push(subarr);
+
+      }
+      console.log(arr);
+      return arr;
+    }
   }
 }
 </script>

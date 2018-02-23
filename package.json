@@ -8,6 +8,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "jquery": "^3.3.1",
     "vue": "^2.5.13"
   },
   "devDependencies": {
@@ -26,12 +27,26 @@
     "extends": [
       "plugin:vue/essential",
       "eslint:recommended"
-    ]
+    ],
+    "globals":{
+      "$":true,
+      "jQuery": true
+    }
   },
   "postcss": {
     "plugins": {
       "autoprefixer": {}
     }
+  },
+  "globals": {
+      "$":true,
+      "jQuery": true
+  },
+  "env": {
+    "browser": true,
+    "commonjs": true,
+    "es6": true,
+    "jquery": true
   },
   "browserslist": [
     "> 1%",
