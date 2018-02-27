@@ -33,7 +33,7 @@ export default {
       for(var i = 0, len = 200; i<len; i++){
         var subarr = [];
         for(var j=0, jlen = 5; j<jlen; j++){
-          subarr.push("test");
+          subarr.push("test" + i);
         }
         arr.push(subarr);
 
@@ -47,6 +47,10 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.hello{
+  max-height: 100%;
+  height: auto;
+}
 h3 {
   margin: 40px 0 0;
 }
