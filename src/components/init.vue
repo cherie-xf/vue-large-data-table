@@ -30,7 +30,7 @@ export default {
   computed: {
     rows: function(){
       var arr = [];
-      for(var i = 0, len = 100; i<len; i++){
+      for(var i = 0, len = 10000; i<len; i++){
         var subarr = [];
         for(var j=0, jlen = 50; j<jlen; j++){
           subarr.push("test" + (i+1));

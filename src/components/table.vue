@@ -53,7 +53,7 @@ export default {
       rowTranslateY: 0,
       currentScrollY: 0,
       currentScrollX: 0,
-      isUnequalRowHeight: true,// default is equal row height
+      isUnequalRowHeight: false,// default is equal row height
       setRowHeight: 35,
       setRowCount: 20,
       lastFirstIndex: 0,
@@ -176,6 +176,9 @@ export default {
       } // end for
       return lIndex;
     },
+    onResize: function(){
+      this.throttle(this.windowsResize, this, 200);
+    },
     //TODO: BIND THIS METHOD with windows resize event
     windowsResize: function(){
       // buffer height will change in computed according to viewHeight
@@ -203,6 +206,8 @@ export default {
       $(th).css("flexGrow", "0"); // for resize
     }, this);
     this.windowsResize();
+    // unbind in beforeDestroy
+    $(window).bind('resize', this.onResize);
   },
   computed:{
     displayrows: function(){
@@ -226,6 +231,9 @@ export default {
       return scrollHeight;
     }
 
+  },
+  beforeDesdroy: function(){
+    $(window).unbind('resize');
   },
   updated: function(){
     console.log('updated', this.copyrows);
