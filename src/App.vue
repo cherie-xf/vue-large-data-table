@@ -3,23 +3,17 @@
     <!--
     <img src="./assets/logo.png">
     -->
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <init msg="Welcome to Your Vue.js App"/>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-//import vuTable from './components/table.vue'
-//import vuRowFormat from './components/vu-row-format.vue'
-//import vuThResizer from './components/vu-th-resizer.vue'
+import init from './components/init.vue'
 
 export default {
   name: 'app',
   components: {
-    HelloWorld,
-    //vuTable,
-    //vuRowFormat,
-    //vuThResizer,
+    init,
   }
 }
 </script>

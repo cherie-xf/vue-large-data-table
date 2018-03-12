@@ -12,7 +12,7 @@
 import vuTable from './table.vue'
 //import vuRowFormat from './vu-row-format.vue'
 export default {
-  name: 'HelloWorld',
+  name: 'init',
   props: {
     msg: String
   },
@@ -23,22 +23,28 @@ export default {
   },
     data: function(){
     return {
-      colDefs: ["threat", "threattype", "threatlevel", "threatweight", "incidents"],
+      //colDefs: ["threat", "threattype", "threatlevel", "threatweight", "incidents"],
 
     }
   },
   computed: {
     rows: function(){
       var arr = [];
-      for(var i = 0, len = 200; i<len; i++){
+      for(var i = 0, len = 100; i<len; i++){
         var subarr = [];
-        for(var j=0, jlen = 5; j<jlen; j++){
-          subarr.push("test" + i);
+        for(var j=0, jlen = 50; j<jlen; j++){
+          subarr.push("test" + (i+1));
         }
         arr.push(subarr);
 
       }
-      console.log(arr);
+      return arr;
+    },
+    colDefs: function(){
+      var arr = [];
+      for(var i = 0, len = 50; i < len; i++){
+        arr.push('title' + (i+1));
+      }
       return arr;
     }
   }

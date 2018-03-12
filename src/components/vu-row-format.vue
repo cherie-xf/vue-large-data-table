@@ -1,32 +1,19 @@
 <template>
-  <div class="vu-format-tr" :class="{'odd': (rowIndex+1+lastFirstIndex)%2 !==0}">
-    <div class="vu-td fixed-td">{{rowIndex+1+lastFirstIndex}}</div>
+  <div class="vu-format-tr" :class="{'odd': (rowIndex+1+bufferFirstIndex)%2 !==0}">
+    <div class="vu-td fixed-td">{{rowIndex+1+bufferFirstIndex}}</div>
     <div v-for="(col, colIndex) in row" :key="colIndex" class="vu-td" :style="{width: colWidths[colIndex]+'px'}" v-html="col"></div>
   </div>
 </template>
 <script>
 export default {
   name:'vuRowFormat',
-  props:['colDefs','row', 'rowIndex', 'colWidths', 'changeIndex', 'changeWidth', 'rowHeights', 'rowTranslateY', 'lastFirstIndex'],
-  //template:'<div class="vu-format-tr"></div>',
+  props:['colDefs','row', 'rowIndex', 'colWidths', 'changeIndex', 'changeWidth', 'rowHeights', 'rowTranslateY', 'setRowHeight', 'bufferFirstIndex','isUnequalRowHeight'],
   mounted: function(){
-    /*
-    if((this.rowIndex + 1) % 2 !== 0){
-      $(this.$el).addClass('odd');
+    if(!this.isUnequalRowHeight){
+      $(this.$el).height(this.setRowHeight);
     }
-    $(this.$el).append('<div class="vu-td fixed-td">'+(this.rowIndex + 1)+'</div>');
-    this.$nextTick(function(){
-      this.row.forEach(function(col, idx){
-        var td = $('<div class="vu-td"></div>').append(col);
-        if(this.colWidths[idx]){
-          td.width(this.colWidths[idx]);
-        }
-        $(this.$el).append(td);
-      }, this);
-    });
-    */
     this.rowHeights[this.rowIndex] = $(this.$el).height();
-    console.log('row height', $(this.$el).height());
+    console.log('is equal row height: ', this.isUnequalRowHeight);
   },
   methods: {
     resizeTds: function(){
@@ -39,7 +26,7 @@ export default {
       });
     },
     scrollHandle: function(){
-      $(this.$el).css('transform', 'translate3d(0px, '+ this.rowTranslateY +'px, 0px');
+      $(this.$el).css('transform', 'translate3d(0px, '+ this.bufferFirstIndex  * this.setRowHeight +'px, 0px');
     }
   },
   watch: {
@@ -47,7 +34,9 @@ export default {
       this.resizeTds();
     },
     rowTranslateY: function(){
-      console.log('row format current scroll y change', this.currentScrollY)
+      //console.log('row format current scroll y change', this.rowTranslateY)
+      //console.log('buffer first index change', this.bufferFirstIndex)
+      //console.log('current first index change', this.lastFirstIndex)
       this.scrollHandle();
     },
   }
