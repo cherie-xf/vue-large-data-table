@@ -59,6 +59,7 @@ export default {
       lastFirstIndex: 0,
       bufferFirstIndex: 0,
       copyrows:[],
+      frameTimer: null,
     }
   },
   created: function(){
@@ -96,13 +97,25 @@ export default {
       this.currentScrollX = tbody.scrollLeft();
       this.tbodyWidth = tbody.width();
       console.log('lastScrollY', this.lastScrollY,'currentScrollY', this.currentScrollY);
-      this.throttle(this.scrollTick, this, 200)
+      this.scrollTick();
       this.handleHorizontalScroll();
     },
     scrollTick: function(){
+      if(cancelAnimationFrame && this.frameTimer){
+        cancelAnimationFrame(this.frameTimer);
+      } 
+      if(requestAnimationFrame){
+        this.frameTimer = requestAnimationFrame(this.updataPageConfig);
+      } else {
+        this.throttle(this.updataPageConfig, this, 16)
+      }
+
+/*
+
       this.$nextTick(function(){
         this.updataPageConfig();
       });
+      */
     },
     getRows: function(){
         console.log('get rows, current firstIndex',this.scrollRowIdxs.firstIndex, 'last first index: ',this.lastFirstIndex);
@@ -244,7 +257,8 @@ export default {
 <style scoped>
 
 .vu-table {
-  height: 600px;
+  height: 800px;
+  width: 1000px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
