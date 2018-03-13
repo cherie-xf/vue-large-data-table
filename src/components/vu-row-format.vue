@@ -1,10 +1,10 @@
 <template>
   <div class="vu-format-tr" :class="{'odd': (rowIndex+1+bufferFirstIndex)%2 !==0}">
     <div class="vu-td fixed-td">{{rowIndex+1+bufferFirstIndex}}</div>
-    <!--
     <div v-for="(col, colIndex) in row" :key="colIndex" class="vu-td" :style="{width: colWidths[colIndex]+'px'}" v-html="col"></div>
-    -->
+    <!--
     <graphCol v-for="(col, colIndex) in row" :key="colIndex" class="vu-td" :style="{width: colWidths[colIndex]+'px'}"></graphCol>
+    -->
   </div>
 </template>
 <script>
@@ -25,10 +25,18 @@ export default {
   methods: {
     resizeTds: function(){
       this.$nextTick(function(){
-        var tds = $(this.$el).find('.vu-td:not(".fixed-td")').toArray();
-        $(tds[this.changeIndex]).outerWidth(this.colWidths[this.changeIndex]);
         var oldWidth = $(this.$el).width();
-        $(this.$el).width(oldWidth + this.changeWidth);
+        var scrollWidth = $(this.$el)[0].scrollWidth;
+        if(oldWidth !== scrollWidth){
+          $(this.$el).width(scrollWidth);
+          console.log('resize tds', $(this.$el).width(), $(this.$el)[0].scrollWidth);
+        }
+        if(this.changeIndex !== null && this.changeWidth > 0){
+          var tds = $(this.$el).find('.vu-td:not(".fixed-td")').toArray();
+          $(tds[this.changeIndex]).outerWidth(this.colWidths[this.changeIndex]);
+          $(this.$el).width(oldWidth + this.changeWidth);
+          console.log('resize tds', this.changeWidth);
+        }
 
       });
     },
