@@ -11,6 +11,7 @@ Vue.config.productionTip = false;
 Vue.config.devtools = true;
 Vue.component('vuRowFormat', require('./components/vu-row-format.vue').default);
 Vue.component('vuThResizer', require('./components/vu-th-resizer.vue').default);
+Vue.component('graphCol', require('./components/graphCol.vue').default);
 
 new Vue({
   render: h => h(App)

@@ -1,12 +1,19 @@
 <template>
   <div class="vu-format-tr" :class="{'odd': (rowIndex+1+bufferFirstIndex)%2 !==0}">
     <div class="vu-td fixed-td">{{rowIndex+1+bufferFirstIndex}}</div>
+    <!--
     <div v-for="(col, colIndex) in row" :key="colIndex" class="vu-td" :style="{width: colWidths[colIndex]+'px'}" v-html="col"></div>
+    -->
+    <graphCol v-for="(col, colIndex) in row" :key="colIndex" class="vu-td" :style="{width: colWidths[colIndex]+'px'}"></graphCol>
   </div>
 </template>
 <script>
+import graphCol from './graphCol.vue'
 export default {
   name:'vuRowFormat',
+  components: {
+    graphCol,
+  },
   props:['colDefs','row', 'rowIndex', 'colWidths', 'changeIndex', 'changeWidth', 'rowHeights', 'rowTranslateY', 'setRowHeight', 'bufferFirstIndex','isUnequalRowHeight'],
   mounted: function(){
     if(!this.isUnequalRowHeight){

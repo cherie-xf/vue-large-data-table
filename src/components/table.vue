@@ -54,7 +54,7 @@ export default {
       currentScrollY: 0,
       currentScrollX: 0,
       isUnequalRowHeight: false,// default is equal row height
-      setRowHeight: 35,
+      setRowHeight: 50,
       setRowCount: 20,
       lastFirstIndex: 0,
       bufferFirstIndex: 0,
@@ -109,13 +109,6 @@ export default {
       } else {
         this.throttle(this.updataPageConfig, this, 16)
       }
-
-/*
-
-      this.$nextTick(function(){
-        this.updataPageConfig();
-      });
-      */
     },
     getRows: function(){
         console.log('get rows, current firstIndex',this.scrollRowIdxs.firstIndex, 'last first index: ',this.lastFirstIndex);
@@ -159,8 +152,9 @@ export default {
       };
     },
     getUnequalFirstLastIndex: function(){
-      //TODO: BI SEARCH  to set fIndex
-      var fIndex, lIndex, height, heightOnebehind, flen;
+      //TODO: BINARY SEARCH  to set fIndex
+      var fIndex, lIndex, height, heightOnebehind;
+      /*
       for(fIndex = 0, flen = this.rowHeights.length; fIndex < flen; fIndex++){
         height =  this.rowHeights.slice(0, fIndex).reduce(function(res, height){
           return res += height;
@@ -170,6 +164,21 @@ export default {
           break;
         }//end if
       }//end for
+      */
+      var low = 0, high = this.rowHeights.length - 1;
+      while(low <= high){
+        var mid = Math.floor(low + (high - low)/2);
+        height =  this.rowHeights.slice(0, mid).reduce(function(res, height){
+          return res += height;
+        },0);
+        heightOnebehind = height + this.rowHeights[fIndex];
+        if(heightOnebehind < this.currentScrollY){ low = mid +1;}
+        if(height > this.currentScrollY){ high = mid - 1;}
+        if((this.currentScrollY > height && this.currentScrollY < heightOnebehind) || this.currentScrollY === height || this.currentScrollY === heightOnebehind ){
+          fIndex = mid;
+          break;
+        }
+      }
       lIndex = this.getUnequalLastIndex(fIndex);
       return {
         firstIndex: fIndex,
@@ -228,7 +237,7 @@ export default {
     },
     bufferRowCount: function(){
       //here to set the buffer row
-      return this.viewHeight * 0.8 / this.setRowHeight;
+      return this.viewHeight * 0.5 / this.setRowHeight;
     },
     // tbody with scroll height base on set rowHeight and raw data count
     scrollHeight: function(){
@@ -318,7 +327,6 @@ export default {
   background-color: #eff4f7;
 }
 .vu-table .vu-tbody .vu-format-tr >>> .vu-td {
-  height: 100%;
   overflow-x: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
