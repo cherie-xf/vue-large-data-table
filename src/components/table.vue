@@ -53,7 +53,7 @@ export default {
       rowTranslateY: 0,
       currentScrollY: 0,
       currentScrollX: 0,
-      isUnequalRowHeight: true,// default is equal row height
+      isUnequalRowHeight: false,// default is equal row height
       setRowHeight: 50,
       setRowCount: 20,
       lastFirstIndex: 0,
@@ -111,17 +111,14 @@ export default {
       }
     },
     getRows: function(){
-        console.log('get rows, current firstIndex',this.scrollRowIdxs.firstIndex, 'last first index: ',this.lastFirstIndex);
         var startIdx = this.scrollRowIdxs.firstIndex;
         var endIdx = Math.ceil(this.scrollRowIdxs.lastIndex);
         if(this.scrollRowIdxs.firstIndex !== this.lastFirstIndex){
           endIdx = Math.ceil(endIdx + this.bufferRowCount);
-          startIdx = startIdx - this.bufferRowCount > 0 ? Math.ceil(startIdx - this.bufferRowCount) : 0;
+          startIdx = (startIdx - this.bufferRowCount) > 0 ? Math.ceil(startIdx - this.bufferRowCount) : 0;
           this.bufferFirstIndex = startIdx;
-          console.log('get rows, bufferrowcount:', this.bufferRowCount, 'buffer index:', this.bufferFirstIndex);
           this.copyrows = this.rows.slice(0);
-          this.copyrows = this.copyrows.splice(startIdx,  endIdx- startIdx);
-          console.log('get copy rows: ', this.copyrows);
+          this.copyrows = this.copyrows.splice(startIdx,  endIdx- startIdx + 1);
           this.lastFirstIndex= this.scrollRowIdxs.firstIndex;
           this.rowTranslateY = this.currentScrollY;
         } 
@@ -150,29 +147,19 @@ export default {
       var fIndex, lIndex;
       fIndex = Math.max( Math.floor((this.currentScrollY / this.setRowHeight), 0) ,0); 
       lIndex = fIndex + Math.max(this.viewHeight /this.setRowHeight, this.setRowCount); 
+      lIndex = lIndex > this.rows.length ? this.rows.length : lIndex;
       return {
         firstIndex: fIndex,
         lastIndex: lIndex,
       };
     },
     getUnequalFirstLastIndex: function(){
-      //TODO: BINARY SEARCH  to set fIndex
+      //BINARY SEARCH  to set fIndex
       var fIndex = 0, lIndex, height, heightOnebehind;
-      /*
-      for(fIndex = 0, flen = this.rowHeights.length; fIndex < flen; fIndex++){
-        height =  this.rowHeights.slice(0, fIndex).reduce(function(res, height){
-          return res += height;
-        },0);
-        heightOnebehind = height + this.rowHeights[fIndex];
-        if(this.currentScrollY > height && this.currentScrollY <= heightOnebehind){
-          break;
-        }//end if
-      }//end for
-      */
       var low = 0; 
       var high = this.rowHeights.length - 1;
       while(low <= high){
-        console.log("get un equal row height", this.rowHeights, height, heightOnebehind, low, high);
+        //console.log("get un equal row height", height, heightOnebehind, low, high);
         var mid = Math.floor(low + (high - low)/2);
         height =  this.rowHeights.slice(0, mid+1).reduce(function(res, height){
           return res += height;
@@ -190,10 +177,11 @@ export default {
         }
         if((this.currentScrollY > height && this.currentScrollY < heightOnebehind) || this.currentScrollY === height || this.currentScrollY === heightOnebehind ){
           fIndex = mid;
-          console.log("get first index:", fIndex);
           break;
         }
+        fIndex = mid;
       }
+      console.log("get first index:", fIndex);
       lIndex = this.getUnequalLastIndex(fIndex);
       return {
         firstIndex: fIndex,
@@ -203,27 +191,28 @@ export default {
     getUnequalLastIndex: function(fIndex){
       var lIndex;
       for(var i = fIndex + 1, len = this.rowHeights.length; i < len; i++){
-        var fullHeight = this.rowHeights.slice(0, i).reduce(function(res, height){
+        var fullHeight = this.rowHeights.slice(0, i + 1).reduce(function(res, height){
           return res += height;
         }, 0);
         if(fullHeight >= this.currentScrollY + this.viewHeight){
           lIndex = i;
           break;
         }
+        lIndex = i;
       } // end for
+      console.log('get last index', fullHeight, this.currentScrollY, this.viewHeight);
       return lIndex;
     },
     onResize: function(){
       this.throttle(this.windowsResize, this, 2);
     },
-    //TODO: BIND THIS METHOD with windows resize event
+    //BIND THIS METHOD with windows resize event
     windowsResize: function(){
       // buffer height will change in computed according to viewHeight
       this.viewHeight = $(window).height();
       var tbody = $(this.$el).find('.vu-tbody-container');
       tbody.height(this.scrollHeight);
-      console.log('view height', this.viewHeight);
-      console.log('scroll height', tbody.height());
+      console.log('view height', this.viewHeight, 'scroll height', tbody.height());
     },
     throttle: function(method, context, delay){
       console.log('in throttle: ', method.tId);
@@ -235,7 +224,6 @@ export default {
     },
   },
   mounted: function(){
-    //console.log('mounted', moment(Date.now()).format("mm:ss"));
     var ths = $(this.$el).find('.vu-thead > .vu-th:not(".fixed-th")').toArray();
     ths.forEach(function(th){
       this.colWidths.push(th.offsetWidth);
@@ -273,7 +261,7 @@ export default {
     $(window).unbind('resize');
   },
   updated: function(){
-    console.log('updated', this.copyrows);
+    //console.log('updated', this.copyrows);
   }
 }
 </script>
@@ -281,7 +269,7 @@ export default {
 <style scoped>
 
 .vu-table {
-  height: 800px;
+  height: 600px;
   width: 1000px;
   display: flex;
   flex-direction: column;
@@ -333,12 +321,13 @@ export default {
 .vu-table .vu-tbody .vu-tbody-container {
   height: 100%;
 }
-.vu-table .vu-tbody .vu-format-tr {
+/*
+.vu-table .vu-tbody >>> .vu-format-tr {
   display: flex;
   align-items: center;
   background-color: #f9f9f9;
 }
-.vu-table .vu-tbody .vu-format-tr.odd {
+.vu-table .vu-tbody >>> .vu-format-tr.odd {
   background-color: #eff4f7;
 }
 .vu-table .vu-tbody .vu-format-tr >>> .vu-td {
@@ -353,4 +342,5 @@ export default {
   width: 45px;
   flex-grow: 0;
 }
+*/
 </style>

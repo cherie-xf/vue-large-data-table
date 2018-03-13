@@ -30,9 +30,9 @@ export default {
   computed: {
     rows: function(){
       var arr = [];
-      for(var i = 0, len = 1000; i<len; i++){
+      for(var i = 0, len = 100000; i<len; i++){
         var subarr = [];
-        for(var j=0, jlen = 5; j<jlen; j++){
+        for(var j=0, jlen = 50; j<jlen; j++){
           subarr.push("test" + (i+1));
         }
         arr.push(subarr);
@@ -42,7 +42,7 @@ export default {
     },
     colDefs: function(){
       var arr = [];
-      for(var i = 0, len = 5; i < len; i++){
+      for(var i = 0, len = 50; i < len; i++){
         arr.push('title' + (i+1));
       }
       return arr;

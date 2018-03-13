@@ -97,9 +97,6 @@ export default {
 </script>
 
 <style>
-.svg-graph {
-
-}
 path {
   stroke: steelblue;
   stroke-width: 1;
