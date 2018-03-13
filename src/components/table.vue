@@ -53,7 +53,7 @@ export default {
       rowTranslateY: 0,
       currentScrollY: 0,
       currentScrollX: 0,
-      isUnequalRowHeight: false,// default is equal row height
+      isUnequalRowHeight: true,// default is equal row height
       setRowHeight: 50,
       setRowCount: 20,
       lastFirstIndex: 0,
@@ -129,7 +129,11 @@ export default {
     },
     /** update the page's offset give the scroll position */
     updataPageConfig: function(){
-      this.scrollRowIdxs = this.getFirstLastIndexes();
+      if(this.isUnequalRowHeight){
+        this.scrollRowIdxs = this.getUnequalFirstLastIndex();
+      } else {
+        this.scrollRowIdxs = this.getFirstLastIndexes();
+      }
       console.log("row indexes: ", this.scrollRowIdxs);
       if(this.currentScrollY > this.lastScrollY){
         // scroll down
@@ -153,7 +157,7 @@ export default {
     },
     getUnequalFirstLastIndex: function(){
       //TODO: BINARY SEARCH  to set fIndex
-      var fIndex, lIndex, height, heightOnebehind;
+      var fIndex = 0, lIndex, height, heightOnebehind;
       /*
       for(fIndex = 0, flen = this.rowHeights.length; fIndex < flen; fIndex++){
         height =  this.rowHeights.slice(0, fIndex).reduce(function(res, height){
@@ -165,17 +169,28 @@ export default {
         }//end if
       }//end for
       */
-      var low = 0, high = this.rowHeights.length - 1;
+      var low = 0; 
+      var high = this.rowHeights.length - 1;
       while(low <= high){
+        console.log("get un equal row height", this.rowHeights, height, heightOnebehind, low, high);
         var mid = Math.floor(low + (high - low)/2);
-        height =  this.rowHeights.slice(0, mid).reduce(function(res, height){
+        height =  this.rowHeights.slice(0, mid+1).reduce(function(res, height){
           return res += height;
         },0);
         heightOnebehind = height + this.rowHeights[fIndex];
-        if(heightOnebehind < this.currentScrollY){ low = mid +1;}
-        if(height > this.currentScrollY){ high = mid - 1;}
+        if(this.currentScrollY < this.rowHeights[0]){
+          fIndex = 0; 
+          break;
+        }
+        if(heightOnebehind < this.currentScrollY){
+           low = mid +1;
+        }
+        if(height > this.currentScrollY){
+           high = mid - 1;
+        }
         if((this.currentScrollY > height && this.currentScrollY < heightOnebehind) || this.currentScrollY === height || this.currentScrollY === heightOnebehind ){
           fIndex = mid;
+          console.log("get first index:", fIndex);
           break;
         }
       }
@@ -199,7 +214,7 @@ export default {
       return lIndex;
     },
     onResize: function(){
-      this.throttle(this.windowsResize, this, 200);
+      this.throttle(this.windowsResize, this, 2);
     },
     //TODO: BIND THIS METHOD with windows resize event
     windowsResize: function(){
@@ -244,7 +259,7 @@ export default {
       var scrollHeight;
       if(this.isUnequalRowHeight){
         scrollHeight = this.rowHeights.reduce(function(res, height){
-          res += height;
+          return res += height;
         }, 0);
       } else {
         scrollHeight = this.rows.length * this.setRowHeight;

@@ -41,7 +41,15 @@ export default {
       });
     },
     scrollHandle: function(){
-      $(this.$el).css('transform', 'translate3d(0px, '+ this.bufferFirstIndex  * this.setRowHeight +'px, 0px');
+      if(this.isUnequalRowHeight){
+        var transHeight = this.rowHeights.slice(0, this.bufferFirstIndex).reduce(function(res, height){
+          return res += height;
+        }, 0);
+        $(this.$el).css('transform', 'translate3d(0px, '+ transHeight +'px, 0px');
+
+      } else {
+        $(this.$el).css('transform', 'translate3d(0px, '+ this.bufferFirstIndex  * this.setRowHeight +'px, 0px');
+      }
     }
   },
   watch: {
