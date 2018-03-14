@@ -11,6 +11,7 @@
 <script>
 import vuTable from './table.vue'
 //import vuRowFormat from './vu-row-format.vue'
+const dataURL = "https://mdn.github.io/learning-area/javascript/oojs/json/superheroes.json";
 export default {
   name: 'init',
   props: {
@@ -24,8 +25,16 @@ export default {
     data: function(){
     return {
       //colDefs: ["threat", "threattype", "threatlevel", "threatweight", "incidents"],
+      peoples: [],
 
     }
+  },
+  created: function(){
+    var self = this // create a closure to access component in the callback below
+    $.getJSON(dataURL, function(data) {
+      self.peoples[0] = data;
+    });
+
   },
   computed: {
     rows: function(){
