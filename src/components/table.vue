@@ -48,7 +48,6 @@ export default {
       changeWidth: 0,
       rowHeights: [],
       viewHeight: 500, // default current viewport height
-      ticking: false,
       lastScrollY: 0,
       rowTranslateY: 0,
       currentScrollY: 0,
@@ -71,26 +70,6 @@ export default {
     this.copyrows = this.rows.slice(0, lIndex);
   },
   methods: {
-    thResized: function(args){
-      this.colWidths[args.index] = args.target.outerWidth();
-      this.colWidths = this.colWidths.slice(); // need change reference to trigger watch
-      this.changeIndex = args.index;
-      this.changeWidth = args.changeWidth;
-    },
-    handleHorizontalScroll: function(){
-      var lastPos = 0;
-      //var currentPos = $(ev.target).scrollLeft();
-      var currentPos = this.currentScrollX;
-      var thead = $(this.$el).find('.vu-thead');
-      if(lastPos !== currentPos){
-        thead.css('left', 0-currentPos + 'px');
-      } else {
-        thead.css('left', 0 + 'px');
-      }
-      //var oldWidth = $(ev.target).width();
-      var oldWidth = this.tbodyWidth;
-      thead.width(oldWidth + currentPos);
-    },
     largetDataScroll:function(ev){
       var tbody = $(ev.target);
       this.currentScrollY = tbody.scrollTop();
@@ -107,22 +86,9 @@ export default {
       if(requestAnimationFrame){
         this.frameTimer = requestAnimationFrame(this.updataPageConfig);
       } else {
-        this.throttle(this.updataPageConfig, this, 16)
+        console.log('no request animation frame found');
+        this.throttle(this.updataPageConfig, this, 1000/60);
       }
-    },
-    getRows: function(){
-        var startIdx = this.scrollRowIdxs.firstIndex;
-        var endIdx = Math.ceil(this.scrollRowIdxs.lastIndex);
-        if(this.scrollRowIdxs.firstIndex !== this.lastFirstIndex){
-          endIdx = Math.ceil(endIdx + this.bufferRowCount);
-          startIdx = (startIdx - this.bufferRowCount) > 0 ? Math.ceil(startIdx - this.bufferRowCount) : 0;
-          this.bufferFirstIndex = startIdx;
-          this.copyrows = this.rows.slice(0);
-          this.copyrows = this.copyrows.splice(startIdx,  endIdx- startIdx + 1);
-          this.lastFirstIndex= this.scrollRowIdxs.firstIndex;
-          this.rowTranslateY = this.currentScrollY;
-        } 
-        this.lastScrollY = this.currentScrollY;
     },
     /** update the page's offset give the scroll position */
     updataPageConfig: function(){
@@ -152,6 +118,20 @@ export default {
         firstIndex: fIndex,
         lastIndex: lIndex,
       };
+    },
+    getRows: function(){
+        var startIdx = this.scrollRowIdxs.firstIndex;
+        var endIdx = Math.ceil(this.scrollRowIdxs.lastIndex);
+        if(this.scrollRowIdxs.firstIndex !== this.lastFirstIndex){
+          endIdx = Math.ceil(endIdx + this.bufferRowCount);
+          startIdx = (startIdx - this.bufferRowCount) > 0 ? Math.ceil(startIdx - this.bufferRowCount) : 0;
+          this.bufferFirstIndex = startIdx;
+          this.copyrows = this.rows.slice(0);
+          this.copyrows = this.copyrows.splice(startIdx,  endIdx- startIdx + 1);
+          this.lastFirstIndex= this.scrollRowIdxs.firstIndex;
+          this.rowTranslateY = this.currentScrollY;
+        } 
+        this.lastScrollY = this.currentScrollY;
     },
     getUnequalFirstLastIndex: function(){
       //BINARY SEARCH  to set fIndex
@@ -203,8 +183,25 @@ export default {
       console.log('get last index', fullHeight, this.currentScrollY, this.viewHeight);
       return lIndex;
     },
-    onResize: function(){
-      this.throttle(this.windowsResize, this, 2);
+    handleHorizontalScroll: function(){
+      var lastPos = 0;
+      //var currentPos = $(ev.target).scrollLeft();
+      var currentPos = this.currentScrollX;
+      var thead = $(this.$el).find('.vu-thead');
+      if(lastPos !== currentPos){
+        thead.css('left', 0-currentPos + 'px');
+      } else {
+        thead.css('left', 0 + 'px');
+      }
+      //var oldWidth = $(ev.target).width();
+      var oldWidth = this.tbodyWidth;
+      thead.width(oldWidth + currentPos);
+    },
+    thResized: function(args){
+      this.colWidths[args.index] = args.target.outerWidth();
+      this.colWidths = this.colWidths.slice(); // need change reference to trigger watch
+      this.changeIndex = args.index;
+      this.changeWidth = args.changeWidth;
     },
     //BIND THIS METHOD with windows resize event
     windowsResize: function(){
@@ -213,6 +210,9 @@ export default {
       var tbody = $(this.$el).find('.vu-tbody-container');
       tbody.height(this.scrollHeight);
       console.log('view height', this.viewHeight, 'scroll height', tbody.height());
+    },
+    onResize: function(){
+      this.throttle(this.windowsResize, this, 1000/60);
     },
     throttle: function(method, context, delay){
       console.log('in throttle: ', method.tId);
@@ -240,7 +240,8 @@ export default {
     },
     bufferRowCount: function(){
       //here to set the buffer row
-      return this.viewHeight * 0.5 / this.setRowHeight;
+      var bufferTimes = 0.5;
+      return this.viewHeight * bufferTimes / this.setRowHeight;
     },
     // tbody with scroll height base on set rowHeight and raw data count
     scrollHeight: function(){
