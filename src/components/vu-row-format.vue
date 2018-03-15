@@ -21,7 +21,6 @@ export default {
     return {
       height: 0,
       //isSelected: false,
-      displayRow: this.row,
     };
   },
   props:['colDefs','row', 'rowIndex', 'colWidths', 'changeIndex', 'changeWidth', 'rowHeights', 'rowTranslateY', 'setRowHeight', 'bufferFirstIndex','isUnequalRowHeight'],
@@ -71,17 +70,18 @@ export default {
       //this.isSelected = ! this.isSelected;
       //this.row.active = !this.row.active;
       this.$emit('tr-clicked', {
-        index: this.rowIndex,
+        displayIdx: this.rowIndex,
+        rowIdx: this.rowIndex + this.bufferFirstIndex,
       });
-      console.log("clicked in row", this.row.active);
+      console.log("clicked in row", this.row.active, "row index:", this.rowIndex, "buffer index:", this.rowIndex + this.bufferFirstIndex);
     }
   },
   computed: {
+    displayRow: function(){
+      return this.row;
+    },
     isSelected: function(){
-      this.$nextTick(function(){
-        console.log('computed in row active');
-        return this.displayRow.active;
-      });
+      return this.displayRow.active;
     }
   },
   watch: {
@@ -92,7 +92,7 @@ export default {
       this.scrollHandle();
     },
     row: function(){
-      console.log('row formate watch change:', row.active);
+      console.log('row formate watch change:', this.row.active);
     }
     /*
     // TODO: row height change

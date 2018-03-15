@@ -48,7 +48,7 @@ export default {
       get: function(){
         var arr = [];
         for(var i = 0, len = 100000; i<len; i++){
-        arr.push(this.jsonObj);
+        arr.push(Object.assign({},this.jsonObj));
         }
         console.log('init computed rows:', this.jsonObj);
         return arr;

@@ -206,8 +206,9 @@ export default {
     },
     trClicked: function(args){
       //this.$set(this.rows[args.index], 'active', !this.rows[args.index].active);
-      this.copyrows[args.index].active = !this.copyrows[args.index]
-      console.log('table get click event', this.rows[args.index].active);
+      this.displayrows[args.displayIdx].active = !this.displayrows[args.displayIdx].active;
+      this.copyrows[args.displayIdx].active = this.displayrows[args.displayIdx].active;
+      console.log('table get click event', this.rows[args.rowIdx].active, this.displayrows[args.displayIdx].active);
     },
     //BIND THIS METHOD with windows resize event
     windowsResize: function(){
