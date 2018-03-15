@@ -48,7 +48,11 @@ export default {
       get: function(){
         var arr = [];
         for(var i = 0, len = 100000; i<len; i++){
-        arr.push(Object.assign({},this.jsonObj));
+          var tempObj = Object.assign({},this.jsonObj);
+          tempObj.formed = Math.floor(Math.random() * (2018 - 1956)) + 1956;
+          tempObj.squadName = Math.random().toString(36).substr(2, 5)
+ + tempObj.squadName;
+        arr.push(tempObj);
         }
         console.log('init computed rows:', this.jsonObj);
         return arr;
