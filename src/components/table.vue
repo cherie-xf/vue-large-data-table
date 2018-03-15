@@ -10,6 +10,7 @@
     <div class="vu-tbody" @scroll="largetDataScroll">
       <div class="vu-tbody-container">
         <vuRowFormat
+        @tr-clicked="trClicked"
         :row="row"
         :col-defs="colDefs"
         :col-widths="colWidths"
@@ -62,7 +63,7 @@ export default {
     }
   },
   created: function(){
-    console.log('created');
+    console.log("created table:");
     var lIndex = Math.max(this.viewHeight /this.setRowHeight + this.bufferRowCount, this.setRowCount); // 1.5 times view hight
     if(this.isUnequalRowHeight){
       lIndex = this.getUnequalLastIndex(0);
@@ -75,7 +76,7 @@ export default {
       this.currentScrollY = tbody.scrollTop();
       this.currentScrollX = tbody.scrollLeft();
       this.tbodyWidth = tbody.width();
-      console.log('lastScrollY', this.lastScrollY,'currentScrollY', this.currentScrollY);
+      //console.log('lastScrollY', this.lastScrollY,'currentScrollY', this.currentScrollY);
       this.scrollTick();
       this.handleHorizontalScroll();
     },
@@ -97,7 +98,7 @@ export default {
       } else {
         this.scrollRowIdxs = this.getFirstLastIndexes();
       }
-      console.log("row indexes: ", this.scrollRowIdxs);
+      //console.log("row indexes: ", this.scrollRowIdxs);
       if(this.currentScrollY > this.lastScrollY){
         // scroll down
         this.getRows();
@@ -161,7 +162,7 @@ export default {
         }
         fIndex = mid;
       }
-      console.log("get first index:", fIndex);
+      //console.log("get first index:", fIndex);
       lIndex = this.getUnequalLastIndex(fIndex);
       return {
         firstIndex: fIndex,
@@ -180,7 +181,7 @@ export default {
         }
         lIndex = i;
       } // end for
-      console.log('get last index', fullHeight, this.currentScrollY, this.viewHeight);
+      //console.log('get last index', fullHeight, this.currentScrollY, this.viewHeight);
       return lIndex;
     },
     handleHorizontalScroll: function(){
@@ -203,19 +204,24 @@ export default {
       this.changeIndex = args.index;
       this.changeWidth = args.changeWidth;
     },
+    trClicked: function(args){
+      //this.$set(this.rows[args.index], 'active', !this.rows[args.index].active);
+      this.copyrows[args.index].active = !this.copyrows[args.index]
+      console.log('table get click event', this.rows[args.index].active);
+    },
     //BIND THIS METHOD with windows resize event
     windowsResize: function(){
       // buffer height will change in computed according to viewHeight
       this.viewHeight = $(window).height();
       var tbody = $(this.$el).find('.vu-tbody-container');
       tbody.height(this.scrollHeight);
-      console.log('view height', this.viewHeight, 'scroll height', tbody.height());
+      //console.log('view height', this.viewHeight, 'scroll height', tbody.height());
     },
     onResize: function(){
       this.throttle(this.windowsResize, this, 1000/60);
     },
     throttle: function(method, context, delay){
-      console.log('in throttle: ', method.tId);
+      //console.log('in throttle: ', method.tId);
       clearTimeout(method.tId);
       method.tId = setTimeout(function(){
         method.call(context);
@@ -253,7 +259,7 @@ export default {
       } else {
         scrollHeight = this.rows.length * this.setRowHeight;
       }
-      console.log('scroll height', scrollHeight);
+      //console.log('scroll height', scrollHeight);
       return scrollHeight;
     }
 
@@ -262,7 +268,7 @@ export default {
     $(window).unbind('resize');
   },
   updated: function(){
-    //console.log('updated', this.copyrows);
+    console.log('table updated', this.copyrows);
   }
 }
 </script>
@@ -318,6 +324,12 @@ export default {
 .vu-table .vu-tbody {
   max-height: calc(100% - 28px - 30px);
   overflow: auto;
+  /* keep here to see if need
+  scroll-snap-type: y mandatory;
+  older spec implementation 
+  scroll-snap-destination: 0% 100%;
+  scroll-snap-points-y: repeat(100%);
+  */
 }
 .vu-table .vu-tbody .vu-tbody-container {
   height: 100%;
