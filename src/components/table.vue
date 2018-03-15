@@ -55,7 +55,7 @@ export default {
       currentScrollX: 0,
       isUnequalRowHeight: false,// default is equal row height
       setRowHeight: 50,
-      setRowCount: 20,
+      setRowCount: 20, // set min showing rows count in case view height is too small
       lastFirstIndex: 0,
       bufferFirstIndex: 0,
       copyrows:[],
@@ -263,7 +263,8 @@ export default {
       return scrollHeight;
     },
     sortKey: function(){
-      return this.colDefs[0];
+      //return null;
+      return this.colDefs[1];
     },
     sortedRows: function(){
       var key = this.sortKey;
@@ -274,7 +275,6 @@ export default {
           if(a[key] > b[key]) return 1;
           return 0;
         });
-        console.log('sorted arr:', sortArr);
         return sortArr;
       } else {
         return this.rows;
@@ -306,7 +306,7 @@ export default {
   display: flex;
   background-color: #d2d4d6;
   align-items: center;
-  padding-right: 15px;
+  padding-right: 25px;
 }
 .vu-table .vu-thead .vu-th {
   flex-grow: 1;

@@ -1,12 +1,19 @@
 <template>
   <div class="vu-format-tr" :class="{'odd': (rowIndex+1+bufferFirstIndex)%2 !==0, 'selected': displayRow.active}" @click="onClick">
     <div class="vu-td fixed-td">{{rowIndex+1+bufferFirstIndex}}</div>
-    <div v-for="(col, key, colIndex) in displayRow" :key="key" class="vu-td" :style="{width: colWidths[colIndex]+'px'}" >{{col}}</div>
+    <div v-if="Array.isArray(displayRow) !== Array" v-for="(col, key, colIndex) in displayRow" :key="key" class="vu-td" :style="{'width': colWidths[colIndex]+'px'}" >{{col}}</div>
+    <div v-if="Array.isArray(displayRow) === Array" v-for="(col, colIndex) in displayRow" :key="colIndex" class="vu-td" :style="{'width': colWidths[colIndex]+'px'}" >{{col}}</div>
+    <!--
+    <div v-if="(rowIndex+1+bufferFirstIndex) % 2 === 0" v-for="(col, key) in row" :key="key" class="vu-td" :style="{}" v-html="col"></div>
+    <div v-if="(rowIndex+1+bufferFirstIndex) % 2 !== 0" v-for="(col, colIndex) in row" :key="colIndex" class="vu-td" :style="{height: 200+'px'}" >
+      <img height="200" src="http://thecatapi.com/api/images/get?format=src&amp;type=gif">
+    </div>
+    -->
       <!--
+    <graphCol v-for="(col, colIndex) in displayRow" :key="colIndex" class="vu-td" :style="{width: colWidths[colIndex]+'px'}"></graphCol>
+    -->
+    <!--
     <div v-for="(col, colIndex) in row" :key="colIndex" class="vu-td" :style="{width: colWidths[colIndex]+'px'}" v-html="col"></div>
-    <div v-if="(rowIndex+1+bufferFirstIndex) % 2 === 0" v-for="(col, colIndex) in row" :key="colIndex" class="vu-td" :style="{width: colWidths[colIndex]+'px'}" v-html="col"></div>
-    <graphCol v-if="(rowIndex+1+bufferFirstIndex) % 2 !== 0" v-for="(col, colIndex) in row" :key="colIndex" class="vu-td" :style="{width: colWidths[colIndex]+'px'}"></graphCol>
-    <img v-if="(rowIndex+1+bufferFirstIndex) % 2 !== 0" v-for="(col, colIndex) in row" :key="colIndex" class="vu-td" :style="{width: colWidths[colIndex]+'px'}" height="200" src="http://thecatapi.com/api/images/get?format=src&amp;type=gif">
       -->
   </div>
 </template>
@@ -24,10 +31,6 @@ export default {
     };
   },
   props:['colDefs','row', 'rowIndex', 'colWidths', 'changeIndex', 'changeWidth', 'rowHeights', 'rowTranslateY', 'setRowHeight', 'bufferFirstIndex','isUnequalRowHeight'],
-  beforeMounted: function(){
-    console.log("befor mounted:", this.row);
-
-  },
   mounted: function(){
     if(!this.isUnequalRowHeight){
       $(this.$el).height(this.setRowHeight);
@@ -36,17 +39,26 @@ export default {
       console.log('row height: ', this.height);
       this.rowHeights[this.rowIndex] = this.height;
     }
-    console.log("row format mounted:", this.rowData);
+    this.initTdWith();
   },
   methods: {
+    initTdWith: function(){
+      $(this.$el).find('.vu-td:not(".fixed-td")').toArray().forEach(function(td, idx){
+        if(this.colWidths[idx]){
+          $(td).width(this.colWidths[idx]);
+        }
+      }, this);
+    },
     resizeTds: function(){
       this.$nextTick(function(){
         var oldWidth = this.$el.offsetWidth;
+        /*
         var scrollWidth = $(this.$el)[0].scrollWidth;
         if(oldWidth !== scrollWidth){
           $(this.$el).width(scrollWidth);
           console.log('resize tds', $(this.$el).width(), $(this.$el)[0].scrollWidth);
         }
+        */
         if(this.changeIndex !== null && this.changeWidth > 0){
           var tds = $(this.$el).find('.vu-td:not(".fixed-td")').toArray();
           $(tds[this.changeIndex]).outerWidth(this.colWidths[this.changeIndex]);
@@ -67,8 +79,6 @@ export default {
       $(this.$el).css('transform', 'translate3d(0px, '+ transHeight +'px, 0px');
     },
     onClick: function(){
-      //this.isSelected = ! this.isSelected;
-      //this.row.active = !this.row.active;
       this.$emit('tr-clicked', {
         displayIdx: this.rowIndex,
         rowIdx: this.rowIndex + this.bufferFirstIndex,
@@ -80,9 +90,6 @@ export default {
     displayRow: function(){
       return this.row;
     },
-    isSelected: function(){
-      return this.displayRow.active;
-    }
   },
   watch: {
     colWidths: function(){
@@ -91,9 +98,6 @@ export default {
     rowTranslateY: function(){
       this.scrollHandle();
     },
-    row: function(){
-      console.log('row formate watch change:', this.row.active);
-    }
     /*
     // TODO: row height change
     height: function(){
@@ -103,7 +107,8 @@ export default {
     */
   },
   updated: function(){
-    console.log("row format update", this.row);
+    this.initTdWith();
+    //console.log("row format update", this.row);
   }
 
 

@@ -24,7 +24,7 @@ export default {
   },
   data: function(){
     return {
-      colDefs: ["squadName", "selected", "formed", "homeTown", "members","secretBase"],
+      colDefs: ["id","squadName", "selected", "formed", "homeTown", "members","secretBase"],
       jsonObj: null,
       isDataReady: false,
     }
@@ -40,6 +40,9 @@ export default {
       self.jsonObj.members = data.members;
       self.jsonObj.secretBase = data.secretBase;
       console.log('init data, json object:', self.jsonObj);
+    }, function(e){
+      console.log('init data, json object , erro:', e);
+
     });
 
   },
@@ -48,13 +51,14 @@ export default {
       get: function(){
         var arr = [];
         for(var i = 0, len = 100000; i<len; i++){
-          var tempObj = Object.assign({},this.jsonObj);
+          //var tempObj = Object.assign({},this.jsonObj);
+          var tempObj = $.extend({id: i}, this.jsonObj);
+          tempObj.id = i+1;
           tempObj.formed = Math.floor(Math.random() * (2018 - 1956)) + 1956;
           tempObj.squadName = Math.random().toString(36).substr(2, 5)
  + tempObj.squadName;
         arr.push(tempObj);
         }
-        console.log('init computed rows:', this.jsonObj);
         return arr;
       },
     }
@@ -81,7 +85,7 @@ export default {
   },
   watch: {
     jsonObj: function(){
-      console.log('init jsonObj watched change', this.jsonObj);
+      console.log('init get async data, set data ready flag in watch');
       // very important for the ajax get data
       this.isDataReady = true;
 
