@@ -2,7 +2,7 @@
  <div class="vu-table">
     <div class="vu-thead">
       <div class="vu-th fixed-th">#</div>
-      <div v-for="(coldef, thIndex) in colDefs" class="vu-th" v-bind:key="thIndex">
+      <div v-for="(coldef, thIndex) in colDefs" class="vu-th" v-bind:key="thIndex" :class="{'sort-key': coldef === sortKey}">
         <div v-html="coldef"></div>
         <vuThResizer @th-resized="thResized" v-bind:thIndex="thIndex"></vuThResizer>
       </div>
@@ -68,7 +68,7 @@ export default {
     if(this.isUnequalRowHeight){
       lIndex = this.getUnequalLastIndex(0);
     }
-    this.copyrows = this.rows.slice(0, lIndex);
+    this.copyrows = this.sortedRows.slice(0, lIndex);
   },
   methods: {
     largetDataScroll:function(ev){
@@ -127,7 +127,7 @@ export default {
           endIdx = Math.ceil(endIdx + this.bufferRowCount);
           startIdx = (startIdx - this.bufferRowCount) > 0 ? Math.ceil(startIdx - this.bufferRowCount) : 0;
           this.bufferFirstIndex = startIdx;
-          this.copyrows = this.rows.slice(0);
+          this.copyrows = this.sortedRows.slice(0);
           this.copyrows = this.copyrows.splice(startIdx,  endIdx- startIdx + 1);
           this.lastFirstIndex= this.scrollRowIdxs.firstIndex;
           this.rowTranslateY = this.currentScrollY;
@@ -205,10 +205,9 @@ export default {
       this.changeWidth = args.changeWidth;
     },
     trClicked: function(args){
-      //this.$set(this.rows[args.index], 'active', !this.rows[args.index].active);
       this.displayrows[args.displayIdx].active = !this.displayrows[args.displayIdx].active;
       this.copyrows[args.displayIdx].active = this.displayrows[args.displayIdx].active;
-      console.log('table get click event', this.rows[args.rowIdx].active, this.displayrows[args.displayIdx].active);
+      console.log('table get click event', this.sortedRows[args.rowIdx].active, this.displayrows[args.displayIdx].active);
     },
     //BIND THIS METHOD with windows resize event
     windowsResize: function(){
@@ -262,6 +261,24 @@ export default {
       }
       //console.log('scroll height', scrollHeight);
       return scrollHeight;
+    },
+    sortKey: function(){
+      return this.colDefs[0];
+    },
+    sortedRows: function(){
+      var key = this.sortKey;
+      if(this.sortKey){
+        var sortArr =  this.rows.slice().sort(function(a, b){
+          //console.log('in sort function:', a, b);
+          if(a[key] < b[key]) return -1;
+          if(a[key] > b[key]) return 1;
+          return 0;
+        });
+        console.log('sorted arr:', sortArr);
+        return sortArr;
+      } else {
+        return this.rows;
+      }
     }
 
   },
@@ -308,6 +325,9 @@ export default {
 .vu-table .vu-thead .vu-th.fixed-th {
   width: 45px;
   flex-grow: 0;
+}
+.vu-table .vu-thead .vu-th.sort-key {
+  color: aquamarine;
 }
 .vu-table .vu-thead .vu-th .vu-th-resizer {
   height: 100%;
