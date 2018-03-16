@@ -225,7 +225,7 @@ export default {
       thead.width(oldWidth + currentPos);
     },
     thResized: function(args){
-      this.colWidths[args.index] = args.target.outerWidth();
+      this.colWidths[args.index] = args.target.width();
       this.colWidths = this.colWidths.slice(); // need change reference to trigger watch
       this.changeIndex = args.index;
       this.changeWidth = args.changeWidth;
@@ -261,8 +261,9 @@ export default {
   mounted: function(){
     var ths = $(this.$el).find('.vu-thead > .vu-th:not(".fixed-th")').toArray();
     ths.forEach(function(th){
-      this.colWidths.push(th.offsetWidth);
-      $(th).css("width", th.offsetWidth); // for resize
+      var width = $(th).width();
+      this.colWidths.push(width);
+      $(th).css("width", width); // for resize
       $(th).css("flexGrow", "0"); // for resize
     }, this);
     this.windowsResize();

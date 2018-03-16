@@ -36,10 +36,10 @@ export default {
       $(this.$el).height(this.setRowHeight);
     } else {
       this.height = this.$el.offsetHeight,
-      console.log('row height: ', this.height);
       this.rowHeights[this.rowIndex] = this.height;
     }
     this.initTdWith();
+
   },
   methods: {
     initTdWith: function(){
@@ -50,22 +50,12 @@ export default {
       }, this);
     },
     resizeTds: function(){
-      this.$nextTick(function(){
-        var oldWidth = this.$el.offsetWidth;
-        /*
-        var scrollWidth = $(this.$el)[0].scrollWidth;
-        if(oldWidth !== scrollWidth){
-          $(this.$el).width(scrollWidth);
-          console.log('resize tds', $(this.$el).width(), $(this.$el)[0].scrollWidth);
-        }
-        */
+        var oldWidth = $(this.$el).width();
         if(this.changeIndex !== null && this.changeWidth > 0){
           var tds = $(this.$el).find('.vu-td:not(".fixed-td")').toArray();
-          $(tds[this.changeIndex]).outerWidth(this.colWidths[this.changeIndex]);
+          $(tds[this.changeIndex]).width(this.colWidths[this.changeIndex]);
           $(this.$el).width(oldWidth + this.changeWidth);
         }
-
-      });
     },
     scrollHandle: function(){
       var transHeight = 0;
@@ -108,7 +98,12 @@ export default {
   },
   updated: function(){
     this.initTdWith();
-    //console.log("row format update", this.row);
+    // fix mounted with x scroll bar, row width need expand
+    var oldWidth = $(this.$el).width();
+    var scrollWidth = $(this.$el)[0].scrollWidth;
+    if(oldWidth !== scrollWidth){
+      $(this.$el).width(scrollWidth);
+    }
   }
 
 
