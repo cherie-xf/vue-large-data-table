@@ -20,6 +20,7 @@ export default {
       this.isDrag = false;
       ev && $(document).unbind('mousemove', this.onMove);
       ev && $(document).unbind('mouseup', this.onUp);
+      ev.stopPropagation();
       this.$emit('th-resized', {
         index: this.thIndex,
         target: this.th,
