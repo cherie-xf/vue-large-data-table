@@ -7,7 +7,7 @@
         <vuThResizer @th-resized="thResized" v-bind:thIndex="thIndex"></vuThResizer>
       </div>
     </div>
-    <div class="vu-tbody" @scroll="largetDataScroll">
+    <div class="vu-tbody" @scroll="largeDataScroll">
       <div class="vu-tbody-container">
         <vuRowFormat
         @tr-clicked="trClicked"
@@ -71,11 +71,16 @@ export default {
   },
   methods: {
     initCopyRow: function(){
-      var lIndex = Math.max(this.viewHeight /this.setRowHeight + this.bufferRowCount, this.setRowCount); // 1.5 times view hight
+      var startIdx = this.scrollRowIdxs && this.scrollRowIdxs.firstIndex? this.scrollRowIdxs.firstIndex : 0;
+      var endIdx = startIdx + Math.max(this.viewHeight /this.setRowHeight + this.bufferRowCount, this.setRowCount); // 1.5 times view hight
       if(this.isUnequalRowHeight){
-        lIndex = this.getUnequalLastIndex(0);
+        endIdx = this.getUnequalLastIndex(startIdx);
       }
-      this.copyrows = this.sortedRows.slice(0, lIndex);
+      endIdx = Math.ceil(endIdx + this.bufferRowCount);
+      startIdx = (startIdx - this.bufferRowCount) > 0 ? Math.ceil(startIdx - this.bufferRowCount) : 0;
+      this.copyrows = this.sortedRows.slice(0);
+      this.copyrows = this.copyrows.splice(startIdx,  endIdx- startIdx + 1);
+      this.bufferFirstIndex = startIdx;
     },
     getSortedRows: function(){
       console.log('get sorted row');
@@ -92,7 +97,7 @@ export default {
         return this.rows;
       }
     },
-    largetDataScroll:function(ev){
+    largeDataScroll:function(ev){
       var tbody = $(ev.target);
       this.currentScrollY = tbody.scrollTop();
       this.currentScrollX = tbody.scrollLeft();
@@ -270,7 +275,7 @@ export default {
     },
     bufferRowCount: function(){
       //here to set the buffer row
-      var bufferTimes = 0.5;
+      var bufferTimes = 0;
       return this.viewHeight * bufferTimes / this.setRowHeight;
     },
     // tbody with scroll height base on set rowHeight and raw data count
@@ -296,14 +301,8 @@ export default {
   },
   watch:{
     sortKey: function(){
-      var tbody = $(this.$el).find('vu-tbody');
-      this.currentScrollY = tbody.scrollTop();
-      this.currentScrollX = tbody.scrollLeft();
       this.sortedRows = this.getSortedRows();
-      this.$nextTick(function(){
-        this.getFirstLastIndexes();
-        this.initCopyRow();
-      });
+      this.initCopyRow();
     }
   },
   beforeDesdroy: function(){
