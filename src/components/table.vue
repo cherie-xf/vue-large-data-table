@@ -206,7 +206,6 @@ export default {
     },
     trClicked: function(args){
       this.displayrows[args.displayIdx].active = !this.displayrows[args.displayIdx].active;
-      this.copyrows[args.displayIdx].active = this.displayrows[args.displayIdx].active;
       console.log('table get click event', this.sortedRows[args.rowIdx].active, this.displayrows[args.displayIdx].active);
     },
     //BIND THIS METHOD with windows resize event
