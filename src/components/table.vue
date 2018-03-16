@@ -2,8 +2,8 @@
  <div class="vu-table">
     <div class="vu-thead">
       <div class="vu-th fixed-th">#</div>
-      <div v-for="(coldef, thIndex) in colDefs" class="vu-th" v-bind:key="thIndex" :class="{'sort-key': coldef === sortKey}">
-        <div v-html="coldef"></div>
+      <div v-for="(colDef, thIndex) in colDefs" class="vu-th" v-bind:key="thIndex" :class="{'sort-key': colDef === sortKey}" @click="thOnClick(colDef)">
+        <div v-html="colDef"></div>
         <vuThResizer @th-resized="thResized" v-bind:thIndex="thIndex"></vuThResizer>
       </div>
     </div>
@@ -60,17 +60,38 @@ export default {
       bufferFirstIndex: 0,
       copyrows:[],
       frameTimer: null,
+      sortKey : 'squadName',
+      sortedRows: [],
     }
   },
   created: function(){
     console.log("created table:");
-    var lIndex = Math.max(this.viewHeight /this.setRowHeight + this.bufferRowCount, this.setRowCount); // 1.5 times view hight
-    if(this.isUnequalRowHeight){
-      lIndex = this.getUnequalLastIndex(0);
-    }
-    this.copyrows = this.sortedRows.slice(0, lIndex);
+    this.sortedRows = this.getSortedRows();
+    this.initCopyRow();
   },
   methods: {
+    initCopyRow: function(){
+      var lIndex = Math.max(this.viewHeight /this.setRowHeight + this.bufferRowCount, this.setRowCount); // 1.5 times view hight
+      if(this.isUnequalRowHeight){
+        lIndex = this.getUnequalLastIndex(0);
+      }
+      this.copyrows = this.sortedRows.slice(0, lIndex);
+    },
+    getSortedRows: function(){
+      console.log('get sorted row');
+      var key = this.sortKey;
+      if(this.sortKey){
+        var sortArr =  this.rows.sort(function(a, b){
+          //console.log('in sort function:', a, b);
+          if(a[key] < b[key]) return -1;
+          if(a[key] > b[key]) return 1;
+          return 0;
+        });
+        return sortArr;
+      } else {
+        return this.rows;
+      }
+    },
     largetDataScroll:function(ev){
       var tbody = $(ev.target);
       this.currentScrollY = tbody.scrollTop();
@@ -208,6 +229,10 @@ export default {
       this.displayrows[args.displayIdx].active = !this.displayrows[args.displayIdx].active;
       console.log('table get click event', this.sortedRows[args.rowIdx].active, this.displayrows[args.displayIdx].active);
     },
+    thOnClick: function(colDef){
+      console.log(colDef);
+      this.sortKey = colDef;
+    },
     //BIND THIS METHOD with windows resize event
     windowsResize: function(){
       // buffer height will change in computed according to viewHeight
@@ -261,25 +286,25 @@ export default {
       //console.log('scroll height', scrollHeight);
       return scrollHeight;
     },
+    /*
     sortKey: function(){
       //return null;
       return this.colDefs[1];
     },
-    sortedRows: function(){
-      var key = this.sortKey;
-      if(this.sortKey){
-        var sortArr =  this.rows.slice().sort(function(a, b){
-          //console.log('in sort function:', a, b);
-          if(a[key] < b[key]) return -1;
-          if(a[key] > b[key]) return 1;
-          return 0;
-        });
-        return sortArr;
-      } else {
-        return this.rows;
-      }
-    }
+    */
 
+  },
+  watch:{
+    sortKey: function(){
+      var tbody = $(this.$el).find('vu-tbody');
+      this.currentScrollY = tbody.scrollTop();
+      this.currentScrollX = tbody.scrollLeft();
+      this.sortedRows = this.getSortedRows();
+      this.$nextTick(function(){
+        this.getFirstLastIndexes();
+        this.initCopyRow();
+      });
+    }
   },
   beforeDesdroy: function(){
     $(window).unbind('resize');
