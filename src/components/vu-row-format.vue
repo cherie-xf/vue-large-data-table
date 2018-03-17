@@ -1,8 +1,9 @@
 <template>
-  <div class="vu-format-tr" :class="{'odd': (rowIndex+1+bufferFirstIndex)%2 !==0, 'selected': displayRow.active}" @click="onClick">
+  <div class="vu-format-tr" :class="{'odd': (rowIndex+1+bufferFirstIndex)%2 !==0, 'selected': displayRow.selected}" @click="onClick">
     <div class="vu-td fixed-td">{{rowIndex+1+bufferFirstIndex}}</div>
-    <div v-if="Array.isArray(displayRow) !== Array" v-for="(col, key, colIndex) in displayRow" :key="key" class="vu-td" :style="{'width': colWidths[colIndex]+'px'}" >{{col}}</div>
-    <div v-if="Array.isArray(displayRow) === Array" v-for="(col, colIndex) in displayRow" :key="colIndex" class="vu-td" :style="{'width': colWidths[colIndex]+'px'}" >{{col}}</div>
+    <div v-if="Array.isArray(displayRow) !== Array && !displayRow.isGroup" v-for="(col, key, colIndex) in displayRow" :key="key" class="vu-td" :style="{'width': colWidths[colIndex]+'px'}" >{{col}}</div>
+    <div v-if="Array.isArray(displayRow) === Array && !displayRow.isGroup" v-for="(col, colIndex) in displayRow" :key="colIndex" class="vu-td" :style="{'width': colWidths[colIndex]+'px'}" >{{col}}</div>
+    <div v-if="displayRow.isGroup" class="vu-group-td" >{{displayRow.groupName + ' ('+displayRow.count+') '}}</div>
     <!--
     <div v-if="(rowIndex+1+bufferFirstIndex) % 2 === 0" v-for="(col, key) in row" :key="key" class="vu-td" :style="{}" v-html="col"></div>
     <div v-if="(rowIndex+1+bufferFirstIndex) % 2 !== 0" v-for="(col, colIndex) in row" :key="colIndex" class="vu-td" :style="{height: 200+'px'}" >
@@ -73,7 +74,7 @@ export default {
         displayIdx: this.rowIndex,
         rowIdx: this.rowIndex + this.bufferFirstIndex,
       });
-      console.log("clicked in row", this.row.active, "row index:", this.rowIndex, "buffer index:", this.rowIndex + this.bufferFirstIndex);
+      console.log("clicked in row", this.row.selected, "row index:", this.rowIndex, "buffer index:", this.rowIndex + this.bufferFirstIndex);
     }
   },
   computed: {

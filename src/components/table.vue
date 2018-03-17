@@ -54,19 +54,24 @@ export default {
       currentScrollY: 0,
       currentScrollX: 0,
       isUnequalRowHeight: false,// default is equal row height
-      setRowHeight: 50,
+      setRowHeight: 30,
       setRowCount: 20, // set min showing rows count in case view height is too small
       lastFirstIndex: 0,
       bufferFirstIndex: 0,
       copyrows:[],
       frameTimer: null,
-      sortKey : 'squadName',
+      sortKey : 'id',
+      groupKey: 'country',
       sortedRows: [],
+      groupedRows:[],
     }
   },
   created: function(){
     console.log("created table:");
     this.sortedRows = this.getSortedRows();
+    if(this.groupKey && this.colDefs.indexOf(this.groupKey) > 0){
+      this.sortedRows = this.getGroupedRows();
+    }
     this.initCopyRow();
   },
   methods: {
@@ -85,7 +90,7 @@ export default {
     getSortedRows: function(){
       console.log('get sorted row');
       var key = this.sortKey;
-      if(this.sortKey){
+      if(key){
         var sortArr =  this.rows.sort(function(a, b){
           //console.log('in sort function:', a, b);
           if(a[key] < b[key]) return -1;
@@ -93,6 +98,31 @@ export default {
           return 0;
         });
         return sortArr;
+      } else {
+        return this.rows;
+      }
+    },
+    getGroupedRows: function(){
+      var groupKey = this.groupKey;
+      if(groupKey){
+        var keyArray = this.rows.map(function(row){return row[groupKey];});
+        var groupNameArray = keyArray.filter(function(val, idx, self){ return self.indexOf(val) === idx;});
+        console.log('group name array:', groupNameArray);
+        var groupMap = new Map();
+        groupNameArray.forEach(function(groupName){
+          groupMap.set(groupName, []);
+        });
+        this.rows.forEach(function(row){
+          groupMap.get(row[groupKey]).push(row);
+        });
+        console.log('group map:', groupMap);
+        var groupArr = [];
+        groupMap.forEach(function(arr, key){
+          groupArr.push({groupName: key, count: arr.length, groupBy: groupKey, isGroup: true, selected: false});
+          groupArr = groupArr.concat(arr);
+        });
+        console.log('group arr:', groupArr);
+        return groupArr;
       } else {
         return this.rows;
       }
@@ -231,7 +261,7 @@ export default {
       this.changeWidth = args.changeWidth;
     },
     trClicked: function(args){
-      this.displayrows[args.displayIdx].active = !this.displayrows[args.displayIdx].active;
+      this.displayrows[args.displayIdx].selected = !this.displayrows[args.displayIdx].selected;
       console.log('table get click event', this.sortedRows[args.rowIdx].active, this.displayrows[args.displayIdx].active);
     },
     thOnClick: function(colDef){
@@ -303,6 +333,9 @@ export default {
   watch:{
     sortKey: function(){
       this.sortedRows = this.getSortedRows();
+      if(this.groupKey && this.colDefs.indexOf(this.groupKey) > 0){
+        this.sortedRows = this.getGroupedRows();
+      }
       this.initCopyRow();
     }
   },

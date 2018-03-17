@@ -11,7 +11,8 @@
 <script>
 import vuTable from './table.vue'
 //import vuRowFormat from './vu-row-format.vue'
-const dataURL = "https://mdn.github.io/learning-area/javascript/oojs/json/superheroes.json";
+//const dataURL = "https://mdn.github.io/learning-area/javascript/oojs/json/superheroes.json";
+const dataURL = "https://cdn.rawgit.com/Swimlane/angular-data-table/master/demos/data/olympics.json";
 export default {
   name: 'init',
   props: {
@@ -24,14 +25,18 @@ export default {
   },
   data: function(){
     return {
-      colDefs: ["id","squadName", "selected", "formed", "homeTown", "members","secretBase"],
+      //colDefs: ["id","squadName", "selected", "formed", "homeTown", "members","secretBase"],
+      //colDefs: ["age","athlete", "bronze", "country", "date", "gold","silver", "sport", "total","year"],
+      colDefs: ["id","selected","athlete","age", "country", "year", "date","sport", "gold", "silver", "bronze","total"],
       jsonObj: null,
       isDataReady: false,
+      jsonData: [],
     }
   },
   created: function(){
     var self = this; // create a closure to access component in the callback below
     $.getJSON(dataURL, function(data) {
+      /*
       self.jsonObj = {};
       self.jsonObj.squadName = data.squadName;
       self.jsonObj.active = !(data.active);
@@ -40,6 +45,13 @@ export default {
       self.jsonObj.members = data.members;
       self.jsonObj.secretBase = data.secretBase;
       console.log('init data, json object:', self.jsonObj);
+      */
+     for(var i = 0, len = data.length; i< len; i++){
+       data[i] = $.extend({id: i+1, selected: false}, data[i]);
+
+     }
+     self.jsonData = data;
+
     }, function(e){
       console.log('init data, json object , erro:', e);
 
@@ -47,6 +59,10 @@ export default {
 
   },
   computed: {
+    rows: function(){
+      return this.jsonData;
+    }
+    /*
     rows: {
       get: function(){
         var arr = [];
@@ -62,7 +78,6 @@ export default {
         return arr;
       },
     }
-    /*
     rows: function(){
       var arr = [];
       for(var i = 0, len = 100; i<len; i++){
@@ -89,6 +104,12 @@ export default {
       // very important for the ajax get data
       this.isDataReady = true;
 
+    },
+    jsonData: function(){
+      console.log('init get async data, set data ready flag in watch');
+      // very important for the ajax get data
+      this.isDataReady = true;
+      
     }
   }
 }
