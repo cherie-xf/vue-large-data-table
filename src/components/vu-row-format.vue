@@ -4,7 +4,7 @@
     <div v-if="Array.isArray(displayRow) !== Array && !displayRow.isGroup" v-for="(col, key, colIndex) in displayRow" :key="key" class="vu-td" :style="{'width': colWidths[colIndex]+'px'}" >{{col}}</div>
     <div v-if="Array.isArray(displayRow) === Array && !displayRow.isGroup" v-for="(col, colIndex) in displayRow" :key="colIndex" class="vu-td" :style="{'width': colWidths[colIndex]+'px'}" >{{col}}</div>
     <div v-if="displayRow.isGroup" class="vu-group-td" >
-      <div class="indicator" :class="{'right-arrow': !displayRow.isExpand}"></div>
+      <div class="indicator" :class="{'right-arrow': !displayRow.isExpand, 'down-arrow': displayRow.isExpand}" @click="toggleExpand(displayRow.groupName)"></div>
       {{displayRow.groupName + ' ('+displayRow.count+') '}}
     </div>
     <!--
@@ -78,6 +78,12 @@ export default {
         rowIdx: this.rowIndex + this.bufferFirstIndex,
       });
       console.log("clicked in row", this.row.selected, "row index:", this.rowIndex, "buffer index:", this.rowIndex + this.bufferFirstIndex);
+    },
+    toggleExpand: function(groupName){
+      this.$emit('toggle-expand', {
+        groupName: groupName,
+      });
+      console.log("toggle group", groupName);
     }
   },
   computed: {
@@ -156,15 +162,15 @@ export default {
 .down-arrow {
   width:0;
   height: 0;
-  border-top: 10px solid transparent;
-  border-left: 5px solid #333;
-  border-right: 5px solid #333;
+  border-top: 10px solid #333;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
 }
 .up-arrow {
   width:0;
   height: 0;
-  border-bottom: 10px solid transparent;
-  border-left: 5px solid #333;
-  border-right: 5px solid #333;
+  border-bottom: 10px solid #333;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
 }
 </style>

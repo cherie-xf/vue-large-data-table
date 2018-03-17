@@ -12,6 +12,7 @@
       <div class="vu-tbody-container">
         <vuRowFormat
         @tr-clicked="trClicked"
+        @toggle-expand="groupToggleExpand"
         :row="row"
         :col-defs="colDefs"
         :col-widths="colWidths"
@@ -66,6 +67,7 @@ export default {
       groupKey: 'country',
       sortedRows: [],
       groupedRows:[],
+      groupedMap: new Map(),
     }
   },
   created: function(){
@@ -112,22 +114,34 @@ export default {
         console.log('group name array:', groupNameArray);
         var groupMap = new Map();
         groupNameArray.forEach(function(groupName){
-          groupMap.set(groupName, []);
+          groupMap.set(groupName, {
+            isExpand: true,
+            data: [],
+          });
         });
         this.rows.forEach(function(row){
-          groupMap.get(row[groupKey]).push(row);
+          groupMap.get(row[groupKey]).data.push(row);
         });
-        console.log('group map:', groupMap);
-        var groupArr = [];
-        groupMap.forEach(function(arr, key){
-          groupArr.push({groupName: key, count: arr.length, groupBy: groupKey, isGroup: true, selected: false});
-          groupArr = groupArr.concat(arr);
-        });
-        console.log('group arr:', groupArr);
-        return groupArr;
+        this.groupedMap = new Map(groupMap);
+        console.log('group map:', this.groupedMap);
+        return this.groupMapToArr();
+        //var groupArr = [];
+        //return groupArr;
       } else {
         return this.rows;
       }
+    },
+    groupMapToArr: function(){
+      var groupArr = [];
+      var self = this;
+      this.groupedMap.forEach(function(val, key){
+        groupArr.push({groupName: key, count: val.data.length, groupBy: self.groupKey, isGroup: true, selected: false, isExpand: val.isExpand});
+        if(val.isExpand){
+          groupArr = groupArr.concat(val.data);
+        }
+      });
+      console.log('group arr:', groupArr);
+      return groupArr;
     },
     largeDataScroll:function(ev){
       var tbody = $(ev.target);
@@ -274,6 +288,13 @@ export default {
         this.sortKey = colDef;
         this.sortDesc = true; // default to DESC
       }
+    },
+    groupToggleExpand: function(args){
+      console.log('get event toggle expand', args.groupName);
+      var groupName = args.groupName;
+      this.groupedMap.get(groupName).isExpand = !this.groupedMap.get(groupName).isExpand;
+      this.sortedRows = this.groupMapToArr();
+      this.initCopyRow();
     },
     windowsResize: function(){
       // buffer height will change in computed according to viewHeight
