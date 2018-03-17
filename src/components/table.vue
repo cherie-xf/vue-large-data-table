@@ -3,7 +3,7 @@
     <div class="vu-thead">
       <div class="vu-th fixed-th">#</div>
       <div v-for="(colDef, thIndex) in colDefs" class="vu-th" v-bind:key="thIndex" :class="{'sort-key': colDef === sortKey}" @click="thOnClick(colDef)">
-        <div v-if="colDef === sortKey" class="indicator" :class="{'up-arrow': colDef === sortKey}"></div>
+        <div v-if="colDef === sortKey" class="indicator" :class="{'up-arrow': !sortDesc, 'down-arrow': sortDesc}"></div>
         <div v-html="colDef"></div>
         <vuThResizer @th-resized="thResized" v-bind:thIndex="thIndex"></vuThResizer>
       </div>
@@ -62,6 +62,7 @@ export default {
       copyrows:[],
       frameTimer: null,
       sortKey : 'id',
+      sortDesc: true,
       groupKey: 'country',
       sortedRows: [],
       groupedRows:[],
@@ -98,7 +99,7 @@ export default {
           if(a[key] > b[key]) return 1;
           return 0;
         });
-        return sortArr;
+        return this.sortDesc ? sortArr.reverse() : sortArr;
       } else {
         return this.rows;
       }
@@ -266,10 +267,14 @@ export default {
       console.log('table get click event', this.sortedRows[args.rowIdx].active, this.displayrows[args.displayIdx].active);
     },
     thOnClick: function(colDef){
-      console.log(colDef);
-      this.sortKey = colDef;
+      console.log(colDef, 'DESC:', this.sortDesc);
+      if(this.sortKey === colDef){
+        this.sortDesc = !this.sortDesc;
+      } else {
+        this.sortKey = colDef;
+        this.sortDesc = true; // default to DESC
+      }
     },
-    //BIND THIS METHOD with windows resize event
     windowsResize: function(){
       // buffer height will change in computed according to viewHeight
       this.viewHeight = $(window).height();
@@ -323,16 +328,12 @@ export default {
       //console.log('scroll height', scrollHeight);
       return scrollHeight;
     },
-    /*
-    sortKey: function(){
-      //return null;
-      return this.colDefs[1];
+    sortKeyAndDir: function(){
+      return [this.sortKey, this.sortDesc].join();
     },
-    */
-
   },
   watch:{
-    sortKey: function(){
+    sortKeyAndDir: function(){
       this.sortedRows = this.getSortedRows();
       if(this.groupKey && this.colDefs.indexOf(this.groupKey) > 0){
         this.sortedRows = this.getGroupedRows();
