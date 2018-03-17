@@ -3,6 +3,7 @@
     <div class="vu-thead">
       <div class="vu-th fixed-th">#</div>
       <div v-for="(colDef, thIndex) in colDefs" class="vu-th" v-bind:key="thIndex" :class="{'sort-key': colDef === sortKey}" @click="thOnClick(colDef)">
+        <div v-if="colDef === sortKey" class="indicator" :class="{'up-arrow': colDef === sortKey}"></div>
         <div v-html="colDef"></div>
         <vuThResizer @th-resized="thResized" v-bind:thIndex="thIndex"></vuThResizer>
       </div>
@@ -375,6 +376,10 @@ export default {
   border-right: 1px solid silver;
   position: relative;
   flex-shrink: 0;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-around;
 }
 .vu-table .vu-thead .vu-th:not(.fixed-th) {
   min-width: 50px;
@@ -382,9 +387,6 @@ export default {
 .vu-table .vu-thead .vu-th.fixed-th {
   width: 45px;
   flex-grow: 0;
-}
-.vu-table .vu-thead .vu-th.sort-key {
-  color: aquamarine;
 }
 .vu-table .vu-thead .vu-th .vu-th-resizer {
   height: 100%;
@@ -434,4 +436,28 @@ export default {
   flex-grow: 0;
 }
 */
+.indicator {
+  display: inline-block;
+}
+.right-arrow {
+  width:0;
+  height: 0;
+  border-top: 5px solid transparent;
+  border-left: 10px solid #333;
+  border-bottom: 5px solid transparent;
+}
+.down-arrow {
+  width:0;
+  height: 0;
+  border-top: 10px solid #333;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+}
+.up-arrow {
+  width:0;
+  height: 0;
+  border-bottom: 10px solid #333;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+}
 </style>

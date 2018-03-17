@@ -3,7 +3,10 @@
     <div class="vu-td fixed-td">{{rowIndex+1+bufferFirstIndex}}</div>
     <div v-if="Array.isArray(displayRow) !== Array && !displayRow.isGroup" v-for="(col, key, colIndex) in displayRow" :key="key" class="vu-td" :style="{'width': colWidths[colIndex]+'px'}" >{{col}}</div>
     <div v-if="Array.isArray(displayRow) === Array && !displayRow.isGroup" v-for="(col, colIndex) in displayRow" :key="colIndex" class="vu-td" :style="{'width': colWidths[colIndex]+'px'}" >{{col}}</div>
-    <div v-if="displayRow.isGroup" class="vu-group-td" >{{displayRow.groupName + ' ('+displayRow.count+') '}}</div>
+    <div v-if="displayRow.isGroup" class="vu-group-td" >
+      <div class="indicator" :class="{'right-arrow': !displayRow.isExpand}"></div>
+      {{displayRow.groupName + ' ('+displayRow.count+') '}}
+    </div>
     <!--
     <div v-if="(rowIndex+1+bufferFirstIndex) % 2 === 0" v-for="(col, key) in row" :key="key" class="vu-td" :style="{}" v-html="col"></div>
     <div v-if="(rowIndex+1+bufferFirstIndex) % 2 !== 0" v-for="(col, colIndex) in row" :key="colIndex" class="vu-td" :style="{height: 200+'px'}" >
@@ -139,5 +142,29 @@ export default {
 .vu-td.fixed-td {
   width: 45px;
   flex-grow: 0;
+}
+.indicator {
+  display: inline-block;
+}
+.right-arrow {
+  width:0;
+  height: 0;
+  border-top: 5px solid transparent;
+  border-left: 10px solid #333;
+  border-bottom: 5px solid transparent;
+}
+.down-arrow {
+  width:0;
+  height: 0;
+  border-top: 10px solid transparent;
+  border-left: 5px solid #333;
+  border-right: 5px solid #333;
+}
+.up-arrow {
+  width:0;
+  height: 0;
+  border-bottom: 10px solid transparent;
+  border-left: 5px solid #333;
+  border-right: 5px solid #333;
 }
 </style>
