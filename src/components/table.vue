@@ -188,7 +188,8 @@ export default {
       var fIndex, lIndex;
       fIndex = Math.max( Math.floor((this.currentScrollY / this.setRowHeight), 0) ,0); 
       lIndex = fIndex + Math.max(this.viewHeight /this.setRowHeight, this.setRowCount); 
-      lIndex = lIndex > this.rows.length ? this.rows.length : lIndex;
+      //lIndex = lIndex > this.rows.length ? this.rows.length : lIndex;
+      lIndex = lIndex > this.sortedRows.length ? this.sortedRows.length : lIndex;
       return {
         firstIndex: fIndex,
         lastIndex: lIndex,
