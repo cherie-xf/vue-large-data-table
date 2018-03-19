@@ -34,7 +34,7 @@ export default {
         }
     },
     onDown: function(ev){
-      event && event.preventDefault();
+      ev && ev.preventDefault();
       this.isDrag = true;
       this.th = $(ev.target).closest('.vu-th');
       this.startX = ev.pageX;

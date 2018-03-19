@@ -321,8 +321,6 @@ export default {
       this.$nextTick(function(){
         var tbodyContainer = $(this.$el).find('.vu-tbody-container');
         tbodyContainer.height(this.scrollHeight);
-        var tbody = $(this.$el).find('.vu-tbody');
-        var height = tbody.scrollTop();
       });
     },
     onResize: function(){
