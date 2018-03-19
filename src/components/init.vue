@@ -4,7 +4,15 @@
     <h1>{{ msg }}</h1>
       <vu-table v-bind:col-defs="colDefs" v-bind:rows="rows" ng-non-bindable> </vu-table>
       -->
-      <vuTable v-bind:col-defs="colDefs" v-bind:rows="rows" v-if="isDataReady"></vuTable>
+      <div class="toobal">
+        <label for="checkbox">Collapse All {{collapseOrExpandAll}}</label>
+        <input type="checkbox" id="checkbox" v-model="collapseOrExpandAll">
+      </div>
+      <div class="table">
+        <vuTable v-bind:col-defs="colDefs" v-bind:rows="rows" v-if="isDataReady" :collapse-or-expand-all="collapseOrExpandAll"></vuTable>
+      </div>
+
+
   </div>
 </template>
 
@@ -31,6 +39,7 @@ export default {
       jsonObj: null,
       isDataReady: false,
       jsonData: [],
+      collapseOrExpandAll: true // true : expand all, fasle: collapse all
     }
   },
   created: function(){
@@ -120,8 +129,11 @@ export default {
 .hello{
   max-height: 100%;
   height: auto;
+}
+.table {
   display: flex;
   justify-content: center;
+
 }
 h3 {
   margin: 40px 0 0;

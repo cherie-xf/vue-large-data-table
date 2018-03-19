@@ -38,7 +38,7 @@ import vuThResizer from './vu-th-resizer.vue'
 
 export default {
   name: 'vuTable',
-  props:['colDefs','rows'],
+  props:['colDefs','rows','collapseOrExpandAll'],
   //template: '#vu-table-component',
   comonents: {
     vuRowFormat,
@@ -58,6 +58,7 @@ export default {
       isUnequalRowHeight: false,// default is equal row height
       setRowHeight: 30,
       setRowCount: 20, // set min showing rows count in case view height is too small
+      scrollHeight: 0,
       lastFirstIndex: 0,
       bufferFirstIndex: 0,
       copyrows:[],
@@ -76,6 +77,7 @@ export default {
     if(this.groupKey && this.colDefs.indexOf(this.groupKey) > 0){
       this.sortedRows = this.getGroupedRows();
     }
+    this.setScrollHeight();
     this.initCopyRow();
   },
   methods: {
@@ -294,14 +296,31 @@ export default {
       var groupName = args.groupName;
       this.groupedMap.get(groupName).isExpand = !this.groupedMap.get(groupName).isExpand;
       this.sortedRows = this.groupMapToArr();
+      this.setScrollHeight();
+      console.log('scroll height changed: ', this.scrollHeight);
       this.initCopyRow();
     },
     windowsResize: function(){
       // buffer height will change in computed according to viewHeight
       this.viewHeight = $(window).height();
-      var tbody = $(this.$el).find('.vu-tbody-container');
-      tbody.height(this.scrollHeight);
       //console.log('view height', this.viewHeight, 'scroll height', tbody.height());
+    },
+    setScrollHeight: function(){
+      this.$nextTick(function(){
+        var scrollHeight;
+        if(this.isUnequalRowHeight){
+          scrollHeight = this.rowHeights.reduce(function(res, height){
+            return res += height;
+          }, 0);
+        } else {
+          scrollHeight = this.sortedRows.length * this.setRowHeight;
+        }
+        this.scrollHeight = scrollHeight;
+        console.log('scroll height change:', this.rows.length, this.sortedRows.length, this.setRowHeight, this.sortedRows.length * this.setRowHeight);
+        var tbody = $(this.$el).find('.vu-tbody-container');
+        tbody.height(this.scrollHeight);
+       //return scrollHeight;
+      });
     },
     onResize: function(){
       this.throttle(this.windowsResize, this, 1000/60);
@@ -328,6 +347,9 @@ export default {
     $(window).bind('resize', this.onResize);
   },
   computed:{
+    isExpandAll: function(){
+      return this.collapseOrExpandAll;
+    },
     displayrows: function(){
       return this.copyrows;
     },
@@ -336,6 +358,7 @@ export default {
       var bufferTimes = 0;
       return this.viewHeight * bufferTimes / this.setRowHeight;
     },
+    /*
     // tbody with scroll height base on set rowHeight and raw data count
     scrollHeight: function(){
       var scrollHeight;
@@ -344,11 +367,12 @@ export default {
           return res += height;
         }, 0);
       } else {
-        scrollHeight = this.rows.length * this.setRowHeight;
+        scrollHeight = this.sortedRows.length * this.setRowHeight;
       }
-      //console.log('scroll height', scrollHeight);
+      console.log('scroll height change:', scrollHeight);
       return scrollHeight;
     },
+    */
     sortKeyAndDir: function(){
       return [this.sortKey, this.sortDesc].join();
     },
@@ -360,7 +384,24 @@ export default {
         this.sortedRows = this.getGroupedRows();
       }
       this.initCopyRow();
+    },
+    collapseOrExpandAll: function(){
+        console.log('Watch collapse or expand all changed: ');
+        var self = this;
+        this.groupedMap.forEach(function(val){val.isExpand = self.isExpandAll;});
+        this.sortedRows = this.groupMapToArr();
+        this.setScrollHeight();
+        console.log('scroll height changed: ', this.scrollHeight);
+        this.initCopyRow();
+    },
+    /*
+    isExpandAll: function(){
+        console.log('Watch isExpandAll changed: ');
+        this.groupedMap.forEach(function(val){val.isExpand = this.isExpandAll;});
+        this.sortedRows = this.groupMapToArr();
+        this.initCopyRow();
     }
+    */
   },
   beforeDesdroy: function(){
     $(window).unbind('resize');
