@@ -43,6 +43,10 @@ export default {
       this.rowHeights[this.rowIndex] = this.height;
     }
     this.initTdWith();
+    if(this.rowTranslateY > 0){
+      console.log('row format mounted', this.rowTranslateY);
+      this.scrollHandle();
+    }
 
   },
   methods: {

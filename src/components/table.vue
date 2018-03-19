@@ -307,20 +307,22 @@ export default {
       //console.log('view height', this.viewHeight, 'scroll height', tbody.height());
     },
     setScrollHeight: function(){
+      var scrollHeight;
+      if(this.isUnequalRowHeight){
+        scrollHeight = this.rowHeights.reduce(function(res, height){
+          return res += height;
+        }, 0);
+      } else {
+        scrollHeight = this.sortedRows.length * this.setRowHeight;
+      }
+      this.scrollHeight = scrollHeight;
+        //return scrollHeight;
+
       this.$nextTick(function(){
-        var scrollHeight;
-        if(this.isUnequalRowHeight){
-          scrollHeight = this.rowHeights.reduce(function(res, height){
-            return res += height;
-          }, 0);
-        } else {
-          scrollHeight = this.sortedRows.length * this.setRowHeight;
-        }
-        this.scrollHeight = scrollHeight;
-        console.log('scroll height change:', this.rows.length, this.sortedRows.length, this.setRowHeight, this.sortedRows.length * this.setRowHeight);
-        var tbody = $(this.$el).find('.vu-tbody-container');
-        tbody.height(this.scrollHeight);
-       //return scrollHeight;
+        var tbodyContainer = $(this.$el).find('.vu-tbody-container');
+        tbodyContainer.height(this.scrollHeight);
+        var tbody = $(this.$el).find('.vu-tbody');
+        var height = tbody.scrollTop();
       });
     },
     onResize: function(){
@@ -398,20 +400,12 @@ export default {
         console.log('scroll height changed: ', this.scrollHeight);
         this.initCopyRow();
     },
-    /*
-    isExpandAll: function(){
-        console.log('Watch isExpandAll changed: ');
-        this.groupedMap.forEach(function(val){val.isExpand = this.isExpandAll;});
-        this.sortedRows = this.groupMapToArr();
-        this.initCopyRow();
-    }
-    */
   },
   beforeDesdroy: function(){
     $(window).unbind('resize');
   },
   updated: function(){
-    console.log('table updated', this.copyrows);
+    console.log('table updated', this.currentScrollY, this.scrollHeight, this.rowTranslateY);
   }
 }
 </script>
