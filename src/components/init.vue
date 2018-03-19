@@ -5,11 +5,11 @@
       <vu-table v-bind:col-defs="colDefs" v-bind:rows="rows" ng-non-bindable> </vu-table>
       -->
       <div class="toobal">
-        <label for="checkbox">Collapse All {{collapseOrExpandAll}}</label>
+        <label for="checkbox">Expand All</label>
         <input type="checkbox" id="checkbox" v-model="collapseOrExpandAll">
       </div>
       <div class="table">
-        <vuTable v-bind:col-defs="colDefs" v-bind:rows="rows" v-if="isDataReady" :collapse-or-expand-all="collapseOrExpandAll"></vuTable>
+        <vuTable  @expand-all="setExpandAll" :col-defs="colDefs" :rows="rows" v-if="isDataReady" :collapse-or-expand-all="collapseOrExpandAll"></vuTable>
       </div>
 
 
@@ -106,6 +106,12 @@ export default {
       return arr;
     }
     */
+  },
+  methods: {
+    setExpandAll: function(){
+      console.log('get expand all in init');
+      this.collapseOrExpandAll = true;
+    },
   },
   watch: {
     jsonObj: function(){

@@ -383,7 +383,10 @@ export default {
       this.sortedRows = this.getSortedRows();
       if(this.groupKey && this.colDefs.indexOf(this.groupKey) > 0){
         this.sortedRows = this.getGroupedRows();
+        // all group reset to expand need emit event to change parent collapseOrExpandAll
+        this.$emit('expand-all',{});
       }
+      //this.setScrollHeight(); // will call collapseOrExpandAll to re calculate scroll height
       this.initCopyRow();
     },
     collapseOrExpandAll: function(){
