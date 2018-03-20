@@ -76,7 +76,8 @@ export default {
       }
       $(this.$el).css('transform', 'translate3d(0px, '+ transHeight +'px, 0px');
     },
-    onClick: function(){
+    onClick: function(ev){
+      if($(ev.target).hasClass('indicator')){ return false;}
       this.$emit('tr-clicked', {
         displayIdx: this.rowIndex,
         rowIdx: this.rowIndex + this.bufferFirstIndex,

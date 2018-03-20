@@ -2,7 +2,7 @@
  <div class="vu-table">
     <div class="vu-thead">
       <div class="vu-th fixed-th">#</div>
-      <div v-for="(colDef, thIndex) in colDefs" class="vu-th" v-bind:key="thIndex" :class="{'sort-key': colDef === sortKey}" @click="thOnClick(colDef)">
+      <div v-for="(colDef, thIndex) in colDefs" class="vu-th" v-bind:key="thIndex" :class="{'sort-key': colDef === sortKey}" @click="thOnClick(colDef, $event)">
         <div v-if="colDef === sortKey" class="indicator" :class="{'up-arrow': !sortDesc, 'down-arrow': sortDesc}"></div>
         <div v-html="colDef"></div>
         <vuThResizer @th-resized="thResized" v-bind:thIndex="thIndex"></vuThResizer>
@@ -283,8 +283,9 @@ export default {
       this.displayrows[args.displayIdx].selected = !this.displayrows[args.displayIdx].selected;
       console.log('table get click event', this.sortedRows[args.rowIdx].active, this.displayrows[args.displayIdx].active);
     },
-    thOnClick: function(colDef){
-      console.log(colDef, 'DESC:', this.sortDesc);
+    thOnClick: function(colDef, ev){
+      console.log(colDef, 'DESC:', this.sortDesc, ev.target);
+      if($(ev.target).hasClass('vu-th-resizer')){return false;}
       if(this.sortKey === colDef){
         this.sortDesc = !this.sortDesc;
       } else {
