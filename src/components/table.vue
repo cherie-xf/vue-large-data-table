@@ -73,6 +73,7 @@ export default {
   },
   created: function(){
     console.log("created table:");
+    this.viewHeight = $(window).height();
     this.sortedRows = this.getSortedRows();
     if(this.groupKey && this.colDefs.indexOf(this.groupKey) > 0){
       this.sortedRows = this.getGroupedRows();
@@ -305,6 +306,7 @@ export default {
     windowsResize: function(){
       // buffer height will change in computed according to viewHeight
       this.viewHeight = $(window).height();
+      this.initCopyRow();
       //console.log('view height', this.viewHeight, 'scroll height', tbody.height());
     },
     setScrollHeight: function(){
@@ -340,11 +342,13 @@ export default {
     var ths = $(this.$el).find('.vu-thead > .vu-th:not(".fixed-th")').toArray();
     ths.forEach(function(th){
       var width = $(th).width();
-      this.colWidths.push(width);
       $(th).css("width", width); // for resize
       $(th).css("flexGrow", "0"); // for resize
+      // th size will change after flex grow change
+      width = $(th).width();
+      this.colWidths.push(width);
     }, this);
-    this.windowsResize();
+    //this.windowsResize();
     // unbind in beforeDestroy
     $(window).bind('resize', this.onResize);
   },
