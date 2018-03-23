@@ -111,6 +111,7 @@ export default {
     },
     getGroupedRows: function(){
       var groupKey = this.groupKey;
+      var self = this;
       if(groupKey){
         var keyArray = this.rows.map(function(row){return row[groupKey];});
         var groupNameArray = keyArray.filter(function(val, idx, self){ return self.indexOf(val) === idx;});
@@ -118,7 +119,7 @@ export default {
         var groupMap = new Map();
         groupNameArray.forEach(function(groupName){
           groupMap.set(groupName, {
-            isExpand: true,
+            isExpand: self.isExpandAll,
             data: [],
           });
         });
@@ -275,7 +276,8 @@ export default {
       thead.width(oldWidth + currentPos);
     },
     thResized: function(args){
-      this.colWidths[args.index] = args.target.width();
+      //this.colWidths[args.index] = args.target.width();
+      this.colWidths[args.index] = args.target[0].offsetWidth;
       this.colWidths = this.colWidths.slice(); // need change reference to trigger watch
       this.changeIndex = args.index;
       this.changeWidth = args.changeWidth;
@@ -341,11 +343,17 @@ export default {
   mounted: function(){
     var ths = $(this.$el).find('.vu-thead > .vu-th:not(".fixed-th")').toArray();
     ths.forEach(function(th){
+      // instead of $.width() with getting offsetwidth will enhance performance in firefox
+      /*
       var width = $(th).width();
       $(th).css("width", width); // for resize
+      */
+      var width = th.offsetWidth;
+      $(th).outerWidth(width);
       $(th).css("flexGrow", "0"); // for resize
       // th size will change after flex grow change
-      width = $(th).width();
+      //width = $(th).width();
+      width = th.offsetWidth;
       this.colWidths.push(width);
     }, this);
     //this.windowsResize();

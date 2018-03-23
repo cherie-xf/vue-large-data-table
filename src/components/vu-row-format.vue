@@ -42,7 +42,8 @@ export default {
       this.height = this.$el.offsetHeight,
       this.rowHeights[this.rowIndex] = this.height;
     }
-    this.initTdWith();
+    //col size will assigned by bind-style at mounted first time
+    //this.initTdWith();
     if(this.rowTranslateY > 0){
       console.log('row format mounted', this.rowTranslateY);
       this.scrollHandle();
@@ -53,16 +54,19 @@ export default {
     initTdWith: function(){
       $(this.$el).find('.vu-td:not(".fixed-td")').toArray().forEach(function(td, idx){
         if(this.colWidths[idx]){
-          $(td).width(this.colWidths[idx]);
+          //$(td).width(this.colWidths[idx]);
+          $(td).outerWidth(this.colWidths[idx]);
         }
       }, this);
     },
     resizeTds: function(){
-        var oldWidth = $(this.$el).width();
-        if(this.changeIndex !== null && this.changeWidth > 0){
+        //var oldWidth = $(this.$el).width();
+        var oldWidth = this.$el.offsetWidth;
+        if(this.changeIndex !== null){
           var tds = $(this.$el).find('.vu-td:not(".fixed-td")').toArray();
           $(tds[this.changeIndex]).width(this.colWidths[this.changeIndex]);
-          $(this.$el).width(oldWidth + this.changeWidth);
+          //$(this.$el).width(oldWidth + this.changeWidth);
+          $(this.$el).outerWidth(oldWidth + this.changeWidth);
         }
     },
     scrollHandle: function(){
@@ -114,10 +118,12 @@ export default {
   updated: function(){
     this.initTdWith();
     // fix mounted with x scroll bar, row width need expand
-    var oldWidth = $(this.$el).width();
+    //var oldWidth = $(this.$el).width();
+    var oldWidth = this.$el.offsetWidth;
     var scrollWidth = $(this.$el)[0].scrollWidth;
     if(oldWidth !== scrollWidth){
-      $(this.$el).width(scrollWidth);
+      //$(this.$el).width(scrollWidth);
+      $(this.$el).outerWidth(scrollWidth);
     }
   }
 
