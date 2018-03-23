@@ -24,6 +24,7 @@
         :set-row-height="setRowHeight" 
         :buffer-first-index="bufferFirstIndex"
         :is-unequal-row-height="isUnequalRowHeight"
+        :show-svg="showSvg"
         v-for="(row, rowIndex) in displayrows"
         v-bind:key="rowIndex"></vuRowFormat>
         </div>
@@ -38,7 +39,7 @@ import vuThResizer from './vu-th-resizer.vue'
 
 export default {
   name: 'vuTable',
-  props:['colDefs','rows','collapseOrExpandAll'],
+  props:['colDefs','rows','collapseOrExpandAll','showSvg','showUnequal'],
   //template: '#vu-table-component',
   comonents: {
     vuRowFormat,
@@ -55,7 +56,6 @@ export default {
       rowTranslateY: 0,
       currentScrollY: 0,
       currentScrollX: 0,
-      isUnequalRowHeight: false,// default is equal row height
       setRowHeight: 30,
       setRowCount: 20, // set min showing rows count in case view height is too small
       scrollHeight: 0,
@@ -74,22 +74,28 @@ export default {
   created: function(){
     console.log("created table:");
     this.viewHeight = $(window).height();
-    this.sortedRows = this.getSortedRows();
-    if(this.groupKey && this.colDefs.indexOf(this.groupKey) > 0){
-      this.sortedRows = this.getGroupedRows();
-    }
-    this.setScrollHeight();
-    this.initCopyRow();
+    this.initData();
   },
   methods: {
+    initData:function(){
+      if(this.rows && this.rows.length > 0){
+        this.sortedRows = this.getSortedRows();
+        if(this.groupKey && this.colDefs.indexOf(this.groupKey) > 0){
+          this.sortedRows = this.getGroupedRows();
+        }
+        this.setScrollHeight();
+        this.initCopyRow();
+      }
+    },
     initCopyRow: function(){
       var startIdx = this.scrollRowIdxs && this.scrollRowIdxs.firstIndex? this.scrollRowIdxs.firstIndex : 0;
       var endIdx = startIdx + Math.max(this.viewHeight /this.setRowHeight + this.bufferRowCount, this.setRowCount); // 1.5 times view hight
-      if(this.isUnequalRowHeight){
+      if(this.isUnequalRowHeight && this.rowHeights.length > 0){
         endIdx = this.getUnequalLastIndex(startIdx);
       }
       endIdx = Math.ceil(endIdx + this.bufferRowCount);
       startIdx = (startIdx - this.bufferRowCount) > 0 ? Math.ceil(startIdx - this.bufferRowCount) : 0;
+      console.log('sorted row one:', this.sortKey, this.sortedRows[1].id);
       this.copyrows = this.sortedRows.slice(0);
       this.copyrows = this.copyrows.splice(startIdx,  endIdx- startIdx + 1);
       this.bufferFirstIndex = startIdx;
@@ -97,8 +103,9 @@ export default {
     getSortedRows: function(){
       console.log('get sorted row');
       var key = this.sortKey;
+      var rows = this.rows.slice(0); // need copy , caz this.rows is watched
       if(key){
-        var sortArr =  this.rows.sort(function(a, b){
+        var sortArr =  rows.sort(function(a, b){
           //console.log('in sort function:', a, b);
           if(a[key] < b[key]) return -1;
           if(a[key] > b[key]) return 1;
@@ -106,14 +113,14 @@ export default {
         });
         return this.sortDesc ? sortArr.reverse() : sortArr;
       } else {
-        return this.rows;
+        return rows;
       }
     },
     getGroupedRows: function(){
       var groupKey = this.groupKey;
       var self = this;
       if(groupKey){
-        var keyArray = this.rows.map(function(row){return row[groupKey];});
+        var keyArray = this.sortedRows.map(function(row){return row[groupKey];});
         var groupNameArray = keyArray.filter(function(val, idx, self){ return self.indexOf(val) === idx;});
         console.log('group name array:', groupNameArray);
         var groupMap = new Map();
@@ -123,7 +130,7 @@ export default {
             data: [],
           });
         });
-        this.rows.forEach(function(row){
+        this.sortedRows.forEach(function(row){
           groupMap.get(row[groupKey]).data.push(row);
         });
         this.groupedMap = new Map(groupMap);
@@ -132,7 +139,7 @@ export default {
         //var groupArr = [];
         //return groupArr;
       } else {
-        return this.rows;
+        return this.sortedRows;
       }
     },
     groupMapToArr: function(){
@@ -313,7 +320,7 @@ export default {
     },
     setScrollHeight: function(){
       var scrollHeight;
-      if(this.isUnequalRowHeight){
+      if(this.isUnequalRowHeight && this.rowHeights.length > 0){
         scrollHeight = this.rowHeights.reduce(function(res, height){
           return res += height;
         }, 0);
@@ -361,6 +368,9 @@ export default {
     $(window).bind('resize', this.onResize);
   },
   computed:{
+    isUnequalRowHeight: function(){ 
+      return this.showUnequal
+    },// default is equal row height
     isExpandAll: function(){
       return this.collapseOrExpandAll;
     },
@@ -392,14 +402,20 @@ export default {
     },
   },
   watch:{
+    rows:function(){
+      this.initData();
+    },
     sortKeyAndDir: function(){
       this.sortedRows = this.getSortedRows();
+      console.log('sorted row one:', this.sortKey, this.sortedRows[1].id);
+      //this.setScrollHeight(); // will call collapseOrExpandAll to re calculate scroll height
       if(this.groupKey && this.colDefs.indexOf(this.groupKey) > 0){
+        console.log('sorted row one:', this.sortKey, this.sortedRows[1].id);
         this.sortedRows = this.getGroupedRows();
         // all group reset to expand need emit event to change parent collapseOrExpandAll
         this.$emit('expand-all',{});
       }
-      //this.setScrollHeight(); // will call collapseOrExpandAll to re calculate scroll height
+      console.log('sorted row one:', this.sortKey, this.sortedRows[1].id);
       this.initCopyRow();
     },
     collapseOrExpandAll: function(){
@@ -416,6 +432,7 @@ export default {
     $(window).unbind('resize');
   },
   updated: function(){
+    this.setScrollHeight();
     console.log('table updated', this.currentScrollY, this.scrollHeight, this.rowTranslateY);
   }
 }

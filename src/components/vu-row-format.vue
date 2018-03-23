@@ -1,21 +1,21 @@
 <template>
   <div class="vu-format-tr" :class="{'odd': (rowIndex+1+bufferFirstIndex)%2 !==0, 'selected': displayRow.selected}" @click="onClick">
+
     <div class="vu-td fixed-td">{{rowIndex+1+bufferFirstIndex}}</div>
-    <div v-if="Array.isArray(displayRow) !== Array && !displayRow.isGroup" v-for="(col, key, colIndex) in displayRow" :key="key" class="vu-td" :style="{'width': colWidths[colIndex]+'px'}" >{{col}}</div>
-    <div v-if="Array.isArray(displayRow) === Array && !displayRow.isGroup" v-for="(col, colIndex) in displayRow" :key="colIndex" class="vu-td" :style="{'width': colWidths[colIndex]+'px'}" >{{col}}</div>
-    <div v-if="displayRow.isGroup" class="vu-group-td" >
+    <div v-if="Array.isArray(displayRow) !== Array && !displayRow.isGroup &&!showSvg &&!isUnequalRowHeight" v-for="(col, key, colIndex) in displayRow" :key="key" class="vu-td" :style="{'width': colWidths[colIndex]+'px'}" >{{col}}</div>
+    <div v-if="Array.isArray(displayRow) === Array && !displayRow.isGroup &&!showSvg &&!isUnequalRowHeight" v-for="(col, colIndex) in displayRow" :key="colIndex" class="vu-td" :style="{'width': colWidths[colIndex]+'px'}" >{{col}}</div>
+
+    <div v-if="displayRow.isGroup &&!showSvg &&!isUnequalRowHeight" class="vu-group-td" >
       <div class="indicator" :class="{'right-arrow': !displayRow.isExpand, 'down-arrow': displayRow.isExpand}" @click="toggleExpand(displayRow.groupName)"></div>
       {{displayRow.groupName + ' ('+displayRow.count+') '}}
     </div>
-    <!--
-    <div v-if="(rowIndex+1+bufferFirstIndex) % 2 === 0" v-for="(col, key) in row" :key="key" class="vu-td" :style="{}" v-html="col"></div>
-    <div v-if="(rowIndex+1+bufferFirstIndex) % 2 !== 0" v-for="(col, colIndex) in row" :key="colIndex" class="vu-td" :style="{height: 200+'px'}" >
+
+    <div v-if="isUnequalRowHeight && (rowIndex+1+bufferFirstIndex) % 2 === 0" v-for="(col, key) in row" :key="key" class="vu-td" :style="{}" v-html="col"></div>
+    <div v-if="isUnequalRowHeight && (rowIndex+1+bufferFirstIndex) % 2 !== 0" v-for="(col, colIndex) in row" :key="colIndex" class="vu-td" :style="{height: 200+'px'}" >
       <img height="200" src="http://thecatapi.com/api/images/get?format=src&amp;type=gif">
     </div>
-    -->
-      <!--
-    <graphCol v-for="(col, colIndex) in displayRow" :key="colIndex" class="vu-td" :style="{width: colWidths[colIndex]+'px'}"></graphCol>
-    -->
+
+    <graphCol v-if="showSvg &&!isUnequalRowHeight" v-for="(col, colIndex) in displayRow" :key="colIndex" class="vu-td" :style="{width: colWidths[colIndex]+'px'}"></graphCol>
     <!--
     <div v-for="(col, colIndex) in row" :key="colIndex" class="vu-td" :style="{width: colWidths[colIndex]+'px'}" v-html="col"></div>
       -->
@@ -34,7 +34,7 @@ export default {
       //isSelected: false,
     };
   },
-  props:['colDefs','row', 'rowIndex', 'colWidths', 'changeIndex', 'changeWidth', 'rowHeights', 'rowTranslateY', 'setRowHeight', 'bufferFirstIndex','isUnequalRowHeight'],
+  props:['colDefs','row', 'rowIndex', 'colWidths', 'changeIndex', 'changeWidth', 'rowHeights', 'rowTranslateY', 'setRowHeight', 'bufferFirstIndex','isUnequalRowHeight','showSvg'],
   mounted: function(){
     if(!this.isUnequalRowHeight){
       $(this.$el).height(this.setRowHeight);
