@@ -226,7 +226,7 @@ export default {
     jsonData: function(){
       console.log('init get async data, set data ready flag in watch');
       // very important for the ajax get data
-      if(rows.length === 0){
+      if(this.rows.length === 0){
         this.rows = this.groupData.rows;
       }
     }
